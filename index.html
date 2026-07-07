@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sincronário 13:20</title>
+<meta name="description" content="Sincronário 13 Luas e Tzolkin: kin do dia, oráculo, onda encantada, calculadora de kin de nascimento.">
+<meta name="theme-color" content="#0b0e1a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0e1a; --bg2:#131a2e; --panel:#161d33cc; --panel2:#1b2440;
+  --line:#2a3555; --ink:#e9e6da; --ink-dim:#9aa3c0;
+  --gold:#e8b84b; --gold-dim:#c49a3a;
+  --red:#e05252; --white:#efe9dc; --blue:#5b95e6; --yellow:#eec84f; --green:#5fc08b;
+  --radius:18px;
+  --font-display:"Cinzel",serif; --font-body:"Figtree",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body); background:var(--bg); color:var(--ink);
+  min-height:100dvh; padding-bottom:calc(76px + env(safe-area-inset-bottom));
+  background-image:
+    radial-gradient(1.4px 1.4px at 12% 18%, #ffffffb0 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 8%, #ffffff80 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 88% 30%, #ffd98a99 50%, transparent 51%),
+    radial-gradient(1px 1px at 32% 44%, #ffffff66 50%, transparent 51%),
+    radial-gradient(1.3px 1.3px at 54% 24%, #ffffff90 50%, transparent 51%),
+    radial-gradient(1px 1px at 8% 66%, #ffffff70 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 78% 58%, #ffffff85 50%, transparent 51%),
+    radial-gradient(1px 1px at 44% 80%, #ffd98a80 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 92% 84%, #ffffff70 50%, transparent 51%),
+    radial-gradient(1px 1px at 20% 92%, #ffffff60 50%, transparent 51%),
+    radial-gradient(ellipse 120% 70% at 50% -10%, #1d2a52 0%, transparent 60%),
+    radial-gradient(ellipse 90% 60% at 80% 110%, #241a3d 0%, transparent 60%);
+  background-attachment:fixed;
+}
+header.app{
+  position:sticky;top:0;z-index:30;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:linear-gradient(180deg,#0b0e1af2,#0b0e1acc);
+  border-bottom:1px solid #232c4a;
+  padding:calc(10px + env(safe-area-inset-top)) 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+header.app h1{
+  font-family:var(--font-display);font-size:1.05rem;font-weight:600;letter-spacing:.14em;
+  color:var(--gold);text-transform:uppercase;white-space:nowrap;
+}
+header.app .greg{font-size:.8rem;color:var(--ink-dim);text-align:right;line-height:1.25}
+main{max-width:980px;margin:0 auto;padding:16px 14px 30px}
+.view{display:none;animation:fadeUp .35s ease both}
+.view.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- cards ---------- */
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px;margin-bottom:14px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 10px 30px #00000055;
+}
+.card h3{
+  font-family:var(--font-display);font-size:.82rem;font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:12px;
+}
+.card h3 small{color:var(--ink-dim);letter-spacing:.05em;font-family:var(--font-body);text-transform:none;font-weight:400}
+
+/* ---------- date bar ---------- */
+.datebar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.datebar input[type=date]{
+  flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+  color:var(--ink);font-family:var(--font-body);font-size:1rem;padding:10px 12px;
+  color-scheme:dark;min-width:0;
+}
+.btn{
+  background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+  border-radius:12px;padding:10px 14px;font-family:var(--font-body);font-size:.92rem;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+.btn.gold{background:linear-gradient(135deg,#e8b84b22,#e8b84b0e);border-color:#e8b84b66;color:var(--gold);font-weight:600}
+.jumps{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.jumps::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;background:transparent;border:1px solid var(--line);color:var(--ink-dim);
+  border-radius:99px;padding:5px 12px;font-size:.8rem;cursor:pointer;transition:all .15s;font-family:var(--font-body);
+}
+.chip:hover{color:var(--gold);border-color:var(--gold-dim)}
+.chip.today{color:var(--gold);border-color:#e8b84b88;font-weight:600}
+
+/* ---------- hero kin ---------- */
+.hero{position:relative;overflow:hidden;text-align:center;padding:26px 18px 22px}
+.hero .halo{
+  position:absolute;inset:-40% -20% auto;height:120%;pointer-events:none;
+  background:radial-gradient(ellipse 60% 55% at 50% 30%, var(--sealGlow, #e8b84b22), transparent 70%);
+}
+.glyphRing{
+  position:relative;width:118px;height:118px;margin:0 auto 12px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--sealC,#e8b84b);
+  box-shadow:0 0 0 6px color-mix(in srgb, var(--sealC,#e8b84b) 14%, transparent), 0 0 40px color-mix(in srgb, var(--sealC,#e8b84b) 35%, transparent);
+  background:radial-gradient(circle at 50% 38%, #ffffff10, #00000035);
+}
+.glyphRing svg{width:64px;height:64px;color:var(--sealC,#e8b84b)}
+.kinNum{
+  font-family:var(--font-display);font-size:.85rem;letter-spacing:.3em;color:var(--ink-dim);
+  text-transform:uppercase;margin-bottom:4px;
+}
+.kinNum b{color:var(--gold);font-size:1.05rem;letter-spacing:.2em}
+.kinName{font-family:var(--font-display);font-size:1.55rem;font-weight:700;line-height:1.2;color:var(--ink);margin-bottom:8px}
+.kinSub{color:var(--ink-dim);font-size:.9rem;margin-bottom:12px}
+.toneRow{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
+.toneRow svg{color:var(--sealC,#e8b84b)}
+.badges{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.badge{
+  font-size:.72rem;letter-spacing:.06em;border:1px solid var(--line);border-radius:99px;
+  padding:4px 10px;color:var(--ink-dim);background:#00000030;
+}
+.badge.portal{color:#7fe0a8;border-color:#3f8f63;background:#123422aa;font-weight:600}
+.badge.seal{color:var(--sealC);border-color:color-mix(in srgb, var(--sealC) 50%, transparent)}
+
+/* ---------- oracle ---------- */
+.oracle{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto auto;gap:8px;max-width:430px;margin:0 auto}
+.ocell{
+  border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center;cursor:pointer;
+  background:#00000028;transition:transform .15s, border-color .15s;
+}
+.ocell:hover{transform:translateY(-2px);border-color:var(--gold-dim)}
+.ocell svg{width:34px;height:34px;display:block;margin:0 auto 4px}
+.ocell .role{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:2px}
+.ocell .oname{font-size:.72rem;line-height:1.25;color:var(--ink)}
+.ocell .okin{font-size:.66rem;color:var(--ink-dim);margin-top:2px}
+.ocell.center{border-width:2px;background:#00000045}
+.o-g{grid-column:2;grid-row:1}.o-ant{grid-column:1;grid-row:2}.o-c{grid-column:2;grid-row:2}.o-ana{grid-column:3;grid-row:2}.o-oc{grid-column:2;grid-row:3}
+
+/* ---------- affirmation ---------- */
+.affirm{font-style:italic;font-size:1.02rem;line-height:1.75;text-align:center;color:#efe9dc}
+.affirm .inlakech{display:block;margin-top:10px;font-family:var(--font-display);font-style:normal;font-size:.75rem;letter-spacing:.25em;color:var(--gold-dim)}
+
+/* ---------- wave strip ---------- */
+.waveStrip{display:grid;grid-template-columns:repeat(13,1fr);gap:4px}
+.waveStrip .w{
+  aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:.68rem;color:#0b0e1a;font-weight:700;cursor:pointer;opacity:.55;transition:all .15s;
+}
+.waveStrip .w:hover{opacity:.9}
+.waveStrip .w.cur{opacity:1;outline:2px solid var(--gold);outline-offset:2px}
+
+/* ---------- info grid ---------- */
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.ibox{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#00000025}
+.ibox .k{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:3px}
+.ibox .v{font-size:.9rem;font-weight:600;line-height:1.3}
+.ibox .v small{font-weight:400;color:var(--ink-dim)}
+
+/* ---------- tzolkin ---------- */
+.tzWrap{overflow-x:auto;padding-bottom:6px}
+.tz{display:grid;grid-template-rows:repeat(20,1fr);grid-auto-flow:column;gap:3px;min-width:560px}
+.tz .c{
+  width:100%;min-width:38px;aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;cursor:pointer;font-size:.62rem;font-weight:700;
+  color:#0b0e1acc;position:relative;transition:transform .12s;
+}
+.tz .c:hover{transform:scale(1.12);z-index:2}
+.tz .c.gap::after{content:"";position:absolute;inset:2px;border:1.5px solid #0b0e1a88;border-radius:5px}
+.tz .c.now{outline:2.5px solid #fff;outline-offset:1.5px;z-index:1}
+.tz .c.mystic{box-shadow:inset 0 0 0 100px #ffffff2e}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:.75rem;color:var(--ink-dim)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-1px}
+
+/* ---------- wave view ---------- */
+.waveList{display:flex;flex-direction:column;gap:6px}
+.wrow{
+  display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;
+  padding:8px 12px;background:#00000025;cursor:pointer;transition:border-color .15s;
+}
+.wrow:hover{border-color:var(--gold-dim)}
+.wrow.cur{border-color:var(--gold);background:#e8b84b14}
+.wrow .pos{font-family:var(--font-display);width:26px;text-align:center;color:var(--gold);font-weight:700}
+.wrow svg{width:26px;height:26px;flex:0 0 auto}
+.wrow .nm{flex:1;font-size:.88rem;line-height:1.3}
+.wrow .nm small{display:block;color:var(--ink-dim);font-size:.72rem}
+.wrow .kn{font-size:.7rem;color:var(--ink-dim)}
+
+/* ---------- moons ---------- */
+.moonList{display:flex;flex-direction:column;gap:6px}
+.mrow{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#00000025}
+.mrow.cur{border-color:var(--gold);background:#e8b84b12}
+.mrow .n{font-family:var(--font-display);width:24px;text-align:center;color:var(--gold)}
+.mrow .info{flex:1;font-size:.86rem}.mrow .info small{display:block;color:var(--ink-dim);font-size:.72rem}
+.mrow .dt{font-size:.72rem;color:var(--ink-dim)}
+.moonGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.moonGrid .h{font-size:.6rem;letter-spacing:.08em;color:var(--ink-dim);text-align:center;padding:4px 0;text-transform:uppercase}
+.moonGrid .d{
+  aspect-ratio:1;border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;cursor:pointer;background:#00000025;transition:border-color .15s;
+}
+.moonGrid .d:hover{border-color:var(--gold-dim)}
+.moonGrid .d.now{border-color:var(--gold);box-shadow:0 0 12px #e8b84b44;background:#e8b84b14}
+.moonGrid .d .dm{font-size:.78rem;font-weight:700}
+.moonGrid .d .gg{font-size:.56rem;color:var(--ink-dim)}
+.moonGrid .d i{width:8px;height:8px;border-radius:3px;display:block}
+
+/* ---------- profiles ---------- */
+.pform{display:grid;grid-template-columns:1fr 1fr auto;gap:8px}
+.pform input{
+  background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--ink);
+  font-family:var(--font-body);font-size:.95rem;padding:10px 12px;color-scheme:dark;min-width:0;
+}
+.plist{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.prow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#00000025}
+.prow .sel{width:20px;height:20px;accent-color:var(--gold);cursor:pointer}
+.prow .av{
+  width:44px;height:44px;border-radius:50%;border:1.5px solid var(--sealC);display:flex;
+  align-items:center;justify-content:center;flex:0 0 auto;cursor:pointer;background:#00000030;
+}
+.prow .av svg{width:24px;height:24px;color:var(--sealC)}
+.prow .pi{flex:1;cursor:pointer;min-width:0}
+.prow .pi b{display:block;font-size:.95rem}
+.prow .pi span{font-size:.75rem;color:var(--ink-dim);display:block;line-height:1.35}
+.prow .del{background:none;border:none;color:#77618a;font-size:1.1rem;cursor:pointer;padding:6px}
+.prow .del:hover{color:var(--red)}
+.relbar{margin-top:12px;display:flex;justify-content:center}
+.hint{font-size:.78rem;color:var(--ink-dim);text-align:center;margin-top:10px;line-height:1.5}
+
+/* ---------- modal ---------- */
+.overlay{
+  position:fixed;inset:0;z-index:60;background:#05070fd9;backdrop-filter:blur(6px);
+  display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 12px 40px;
+}
+.overlay.open{display:flex}
+.sheet{width:100%;max-width:560px;animation:fadeUp .3s ease both}
+.sheet .close{
+  position:sticky;top:0;margin-left:auto;display:block;background:#1b2440;border:1px solid var(--line);
+  color:var(--ink);border-radius:99px;width:38px;height:38px;font-size:1.05rem;cursor:pointer;margin-bottom:10px;z-index:2;
+}
+
+/* ---------- nav ---------- */
+nav.tabs{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  display:flex;justify-content:space-around;
+  background:linear-gradient(180deg,#0d1122ee,#0b0e1af8);
+  border-top:1px solid #232c4a;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+}
+nav.tabs button{
+  background:none;border:none;color:var(--ink-dim);font-family:var(--font-body);
+  font-size:.64rem;letter-spacing:.05em;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;gap:3px;padding:4px 10px;border-radius:12px;transition:color .15s;
+}
+nav.tabs button svg{width:21px;height:21px}
+nav.tabs button.on{color:var(--gold)}
+@media(min-width:760px){
+  nav.tabs{position:sticky;top:58px;bottom:auto;justify-content:center;gap:14px;border-top:none;border-bottom:1px solid #232c4a}
+  nav.tabs button{flex-direction:row;font-size:.8rem;gap:7px}
+  body{padding-bottom:40px}
+}
+.two{display:grid;gap:14px}
+@media(min-width:760px){.two{grid-template-columns:1fr 1fr}}
+footer.app{max-width:980px;margin:10px auto 0;padding:0 16px 20px;font-size:.7rem;color:#5a6488;text-align:center;line-height:1.6}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <h1>Sincronário 13:20</h1>
+  <div class="greg" id="hdrDate"></div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="hoje" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/></svg>Hoje</button>
+  <button data-tab="tzolkin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Tzolkin</button>
+  <button data-tab="onda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 15c3-6 5-6 8 0s5 6 8 0"/><path d="M2 8c3-6 5-6 8 0s5 6 8 0" opacity=".45"/></svg>Onda</button>
+  <button data-tab="luas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 13.5A8.5 8.5 0 1 1 10.5 4 6.8 6.8 0 0 0 20 13.5z"/></svg>13 Luas</button>
+  <button data-tab="perfis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.4"/><path d="M3 20c0-3.5 2.6-6 6-6s6 2.5 6 6"/><circle cx="17.5" cy="9.5" r="2.6"/><path d="M15.5 14.4c2.9.2 5 2.4 5 5.6" opacity=".6"/></svg>Perfis</button>
+</nav>
+
+<main>
+  <section class="view active" id="view-hoje"></section>
+  <section class="view" id="view-tzolkin"></section>
+  <section class="view" id="view-onda"></section>
+  <section class="view" id="view-luas"></section>
+  <section class="view" id="view-perfis"></section>
+</main>
+
+<footer class="app">
+  Baseado na contagem do Encantamento do Sonho (Dreamspell) e no Sincronário das 13 Luas.<br>
+  29 de fevereiro: dia 0.0 Hunab Ku (fora da contagem de kins). 25 de julho: Dia Fora do Tempo.
+</footer>
+
+<div class="overlay" id="overlay"><div class="sheet"><button class="close" id="closeModal">✕</button><div id="modalBody"></div></div></div>
+
+<script>
+"use strict";
+/* ================= DADOS ================= */
+const COLORS=[
+ {n:"Vermelho",fem:"Vermelha",hex:"#e05252",faz:"inicia"},
+ {n:"Branco",fem:"Branca",hex:"#efe9dc",faz:"refina"},
+ {n:"Azul",fem:"Azul",hex:"#5b95e6",faz:"transforma"},
+ {n:"Amarelo",fem:"Amarela",hex:"#eec84f",faz:"amadurece"}
+];
+/* selos: nome, gênero (0 masc / 1 fem), maia, poder (exibição), poderDe (frase), ação infinitivo, essência (exibição), essenciaObj (frase) */
+const SEALS=[
+ {name:"Dragão",g:0,maya:"Imix",power:"Nascimento",powerDe:"do nascimento",act:"nutrir",ess:"Ser",essObj:"o ser"},
+ {name:"Vento",g:0,maya:"Ik",power:"Espírito",powerDe:"do espírito",act:"comunicar",ess:"Sopro",essObj:"o sopro"},
+ {name:"Noite",g:1,maya:"Akbal",power:"Abundância",powerDe:"da abundância",act:"sonhar",ess:"Intuição",essObj:"a intuição"},
+ {name:"Semente",g:1,maya:"Kan",power:"Florescimento",powerDe:"do florescimento",act:"ter como alvo",ess:"Percepção",essObj:"a percepção"},
+ {name:"Serpente",g:1,maya:"Chicchan",power:"Força Vital",powerDe:"da força vital",act:"sobreviver",ess:"Instinto",essObj:"o instinto"},
+ {name:"Enlaçador de Mundos",g:0,maya:"Cimi",power:"Morte",powerDe:"da morte",act:"igualar",ess:"Oportunidade",essObj:"a oportunidade"},
+ {name:"Mão",g:1,maya:"Manik",power:"Realização",powerDe:"da realização",act:"conhecer",ess:"Cura",essObj:"a cura"},
+ {name:"Estrela",g:1,maya:"Lamat",power:"Elegância",powerDe:"da elegância",act:"embelezar",ess:"Arte",essObj:"a arte"},
+ {name:"Lua",g:1,maya:"Muluc",power:"Água Universal",powerDe:"da água universal",act:"purificar",ess:"Fluxo",essObj:"o fluxo"},
+ {name:"Cachorro",g:0,maya:"Oc",power:"Coração",powerDe:"do coração",act:"amar",ess:"Lealdade",essObj:"a lealdade"},
+ {name:"Macaco",g:0,maya:"Chuen",power:"Magia",powerDe:"da magia",act:"brincar",ess:"Ilusão",essObj:"a ilusão"},
+ {name:"Humano",g:0,maya:"Eb",power:"Livre Vontade",powerDe:"da livre vontade",act:"influenciar",ess:"Sabedoria",essObj:"a sabedoria"},
+ {name:"Caminhante do Céu",g:0,maya:"Ben",power:"Espaço",powerDe:"do espaço",act:"explorar",ess:"Vigilância",essObj:"a vigilância"},
+ {name:"Mago",g:0,maya:"Ix",power:"Atemporalidade",powerDe:"da atemporalidade",act:"encantar",ess:"Receptividade",essObj:"a receptividade"},
+ {name:"Águia",g:1,maya:"Men",power:"Visão",powerDe:"da visão",act:"criar",ess:"Mente",essObj:"a mente"},
+ {name:"Guerreiro",g:0,maya:"Cib",power:"Inteligência",powerDe:"da inteligência",act:"questionar",ess:"Destemor",essObj:"o destemor"},
+ {name:"Terra",g:1,maya:"Caban",power:"Navegação",powerDe:"da navegação",act:"evoluir",ess:"Sincronicidade",essObj:"a sincronicidade"},
+ {name:"Espelho",g:0,maya:"Etznab",power:"Sem-Fim",powerDe:"do sem-fim",act:"refletir",ess:"Ordem",essObj:"a ordem"},
+ {name:"Tormenta",g:1,maya:"Cauac",power:"Autogeração",powerDe:"da autogeração",act:"catalisar",ess:"Energia",essObj:"a energia"},
+ {name:"Sol",g:0,maya:"Ahau",power:"Fogo Universal",powerDe:"do fogo universal",act:"iluminar",ess:"Vida",essObj:"a vida"}
+];
+/* tons: nome, gênero p/ concordância no nome do kin não se aplica (tom acompanha o selo), poder, poderDe, verbo (1ª pessoa), gerúndio */
+const TONES=[
+ {name:"Magnético",fem:"Magnética",power:"Propósito",powerDe:"do propósito",verb:"unifico",ger:"Atraindo",role:"Propósito: o que atrai"},
+ {name:"Lunar",fem:"Lunar",power:"Desafio",powerDe:"do desafio",verb:"polarizo",ger:"Estabilizando",role:"Desafio: o que estabiliza"},
+ {name:"Elétrico",fem:"Elétrica",power:"Serviço",powerDe:"do serviço",verb:"ativo",ger:"Vinculando",role:"Serviço: o que ativa"},
+ {name:"Autoexistente",fem:"Autoexistente",power:"Forma",powerDe:"da forma",verb:"defino",ger:"Medindo",role:"Forma: o que define"},
+ {name:"Harmônico",fem:"Harmônica",power:"Radiância",powerDe:"da radiância",verb:"potencializo",ger:"Comandando",role:"Radiância: o que fortalece"},
+ {name:"Rítmico",fem:"Rítmica",power:"Igualdade",powerDe:"da igualdade",verb:"organizo",ger:"Equilibrando",role:"Igualdade: o que organiza"},
+ {name:"Ressonante",fem:"Ressonante",power:"Sintonia",powerDe:"da sintonia",verb:"canalizo",ger:"Inspirando",role:"Sintonia: o que canaliza"},
+ {name:"Galáctico",fem:"Galáctica",power:"Integridade",powerDe:"da integridade",verb:"harmonizo",ger:"Modelando",role:"Integridade: o que harmoniza"},
+ {name:"Solar",fem:"Solar",power:"Intenção",powerDe:"da intenção",verb:"pulso",ger:"Realizando",role:"Intenção: o que realiza"},
+ {name:"Planetário",fem:"Planetária",power:"Manifestação",powerDe:"da manifestação",verb:"aperfeiçoo",ger:"Produzindo",role:"Manifestação: o que aperfeiçoa"},
+ {name:"Espectral",fem:"Espectral",power:"Liberação",powerDe:"da liberação",verb:"dissolvo",ger:"Liberando",role:"Liberação: o que dissolve"},
+ {name:"Cristal",fem:"Cristal",power:"Cooperação",powerDe:"da cooperação",verb:"dedico",ger:"Universalizando",role:"Cooperação: o que dedica"},
+ {name:"Cósmico",fem:"Cósmica",power:"Presença",powerDe:"da presença",verb:"perduro",ger:"Transcendendo",role:"Presença: o que transcende"}
+];
+const CELLS=["a entrada","a loja","o processo","a saída","a matriz"];
+const FAMILIES=["Polar","Cardinal","Central","do Sinal","do Portal"]; /* selo%5: 0,1,2,3,4 */
+const CLANS=["Clã do Fogo","Clã do Sangue","Clã da Verdade","Clã do Céu"];
+const CASTLES=[
+ {n:"Castelo Vermelho do Leste",sub:"Corte do Girar: iniciar",hex:"#e05252"},
+ {n:"Castelo Branco do Norte",sub:"Corte do Cruzar: refinar",hex:"#efe9dc"},
+ {n:"Castelo Azul do Oeste",sub:"Corte do Queimar: transformar",hex:"#5b95e6"},
+ {n:"Castelo Amarelo do Sul",sub:"Corte do Dar: amadurecer",hex:"#eec84f"},
+ {n:"Castelo Verde Central",sub:"Corte da Sincronização: encantar",hex:"#5fc08b"}
+];
+const MOONS=[
+ {n:"Magnética do Morcego",q:"Qual é o meu propósito?",tot:"Propósito"},
+ {n:"Lunar do Escorpião",q:"Qual é o meu desafio?",tot:"Desafio"},
+ {n:"Elétrica do Cervo",q:"Como posso servir melhor?",tot:"Serviço"},
+ {n:"Autoexistente da Coruja",q:"Qual é a forma que o meu serviço tomará?",tot:"Forma"},
+ {n:"Harmônica do Pavão",q:"Como posso me potencializar melhor?",tot:"Radiância"},
+ {n:"Rítmica do Lagarto",q:"Como posso estender a igualdade aos outros?",tot:"Igualdade"},
+ {n:"Ressonante do Macaco",q:"Como posso sintonizar meu serviço com os outros?",tot:"Sintonia"},
+ {n:"Galáctica do Falcão",q:"Eu vivo aquilo em que acredito?",tot:"Integridade"},
+ {n:"Solar do Jaguar",q:"Como realizo o meu propósito?",tot:"Intenção"},
+ {n:"Planetária do Cão",q:"Como aperfeiçoo aquilo que faço?",tot:"Manifestação"},
+ {n:"Espectral da Serpente",q:"Como me liberto e deixo ir?",tot:"Liberação"},
+ {n:"Cristal do Coelho",q:"Como posso me dedicar a tudo o que vive?",tot:"Cooperação"},
+ {n:"Cósmica da Tartaruga",q:"Como posso aumentar minha alegria e meu amor?",tot:"Presença"}
+];
+const MOON_STARTS=[[7,26],[8,23],[9,20],[10,18],[11,15],[12,13],[1,10],[2,7],[3,7],[4,4],[5,2],[5,30],[6,27]];
+const PLASMAS=[
+ {n:"Dali",v:"Tem como alvo",c:"coroa"},{n:"Seli",v:"Flui",c:"raiz"},{n:"Gama",v:"Pacifica",c:"terceiro olho"},
+ {n:"Kali",v:"Estabelece",c:"sacro"},{n:"Alfa",v:"Libera",c:"garganta"},{n:"Limi",v:"Purifica",c:"plexo solar"},
+ {n:"Sílio",v:"Descarrega",c:"coração"}
+];
+const HEPTADS=["Semana Vermelha: iniciar o conhecimento","Semana Branca: refinar o humilde","Semana Azul: transformar a paciência","Semana Amarela: amadurecer o fruto"];
+const GAP=new Set([1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,110,111,112,113,114,115,146,147,148,149,150,151,152,153,154,155,165,168,173,176,184,189,192,197,203,210,211,218,222,239,241,260]);
+const WEEKDAYS=["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
+const MONTHS_PT=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+
+/* glifos estilizados dos 20 selos (SVG, traço) */
+const GLYPHS=[
+"M24 9c8.5 0 15 6.2 15 13.6S32.8 36 25.4 36 13 30.8 13 24.6 17.8 14 24 14s10 4.2 10 8.6-3 7.4-7 7.4",
+"M13 15h22M24 15v20M18 35h12",
+"M12 35V22c0-8 5.4-13 12-13s12 5 12 13v13M20 35V25M28 35V25M9 35h30",
+"M24 37c-5 0-9-4-9-9s4-9 9-9 9 4 9 9-4 9-9 9zM24 19c0-6 3-8 8-11M24 28h.1",
+"M12 33c0-6 6-8 12-8s11-2 11-7-5-8-10-8M12 33c3 3 7 4 11 4M35 10l4-3",
+"M10 33c2-10 7.5-16 14-16s12 6 14 16M10 33v4M38 33v4M8 37h32M17 26h.1M31 26h.1",
+"M16 33V19M22 33V13M28 33V15M34 33V21M16 33c0 5 4 7 9 7s9-2 9-7",
+"M24 8l4.5 11.5L40 24l-11.5 4.5L24 40l-4.5-11.5L8 24l11.5-4.5zM24 21v6M21 24h6",
+"M24 9c6 8.5 10 13.5 10 19.5a10 10 0 1 1-20 0C14 22.5 18 17.5 24 9zM24 26h.1",
+"M24 38c-4 0-7-3-7-7s3-6 7-6 7 2 7 6-3 7-7 7zM13 21a3.4 3.4 0 1 0 .1 0M24 13a3.4 3.4 0 1 0 .1 0M35 21a3.4 3.4 0 1 0 .1 0",
+"M24 38c-8 0-14-6-14-14S16 10 24 10s14 6 14 14-6 14-14 14zM24 24c4.5 0 7-2.5 7-7M19 20h.1M29 20h.1",
+"M24 8a6 6 0 1 0 .1 0M14 40c0-10 4-17 10-17s10 7 10 17M14 40h20",
+"M16 40V15M32 40V15M11 15c4-6.5 22-6.5 26 0M16 28h16",
+"M8 24c6.5-8.5 25.5-8.5 32 0-6.5 8.5-25.5 8.5-32 0zM24 24h.1M24 29a5 5 0 0 0 0-10",
+"M8 30c6-11 11-15 16-16M40 30c-6-11-11-15-16-16M24 14v20M19 38l5-4 5 4",
+"M24 39c-7 0-12-5-12-12s5-13 12-13 12 6 12 13-5 12-12 12zM24 14v25M12 27h24M20 9l4-4 4 4",
+"M24 38c-8 0-14-6-14-14s6-14 14-14 14 6 14 14-6 14-14 14zM24 10v28M10 24h28M14 14c7 5 13 11 20 20",
+"M24 8l12 16-12 16-12-16zM24 8v32M18 24h12",
+"M13 24c0-6.5 5-11 11-11s11 4.5 11 11M24 20l-6 9h9l-6 9M13 24c0 3 1 5 3 7",
+"M24 33a9 9 0 1 0-.1 0zM24 6v4M24 38v4M6 24h4M38 24h4M11 11l3 3M34 34l3 3M37 11l-3 3M14 34l-3 3"
+];
+
+/* ================= MATEMÁTICA ================= */
+const MS=86400000;
+const utc=(y,m,d)=>Date.UTC(y,m-1,d);
+function leapsUpTo(y,m,d){const yy=(m>2||(m===2&&d>=29))?y:y-1;return Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400);}
+const ANCHOR=utc(2013,7,26), ANCHOR_KIN=164, ANCHOR_LEAPS=leapsUpTo(2013,7,26);
+function kinFor(y,m,d){
+  if(m===2&&d===29) return 0; /* 0.0 Hunab Ku */
+  const days=Math.round((utc(y,m,d)-ANCHOR)/MS)-(leapsUpTo(y,m,d)-ANCHOR_LEAPS);
+  return ((ANCHOR_KIN-1+days)%260+260)%260+1;
+}
+const sealOf=k=>(k-1)%20+1, toneOf=k=>(k-1)%13+1;
+const colorOf=k=>(sealOf(k)-1)%4;
+function kinFromST(s,t){for(let k=1;k<=260;k++){if(sealOf(k)===s&&toneOf(k)===t)return k}return 1}
+function kinName(k){
+  const s=SEALS[sealOf(k)-1],t=TONES[toneOf(k)-1],c=COLORS[colorOf(k)];
+  return s.name+" "+(s.g?t.fem:t.name)+" "+(s.g?c.fem:c.n);
+}
+function oracleOf(k){
+  const s=sealOf(k),t=toneOf(k);
+  const off=[0,12,4,16,8][(t-1)%5];
+  const gs=(s-1+off)%20+1;
+  let as_=19-s; if(as_<=0)as_+=20;
+  const ans=(s-1+10)%20+1;
+  return {
+    guide:kinFromST(gs,t), analog:kinFromST(as_,t),
+    antipode:kinFromST(ans,t), occult:kinFromST(21-s,14-t),
+    selfGuided:gs===s
+  };
+}
+function waveOf(k){let st=k-(toneOf(k)-1); if(st<1)st+=260; return Array.from({length:13},(_,i)=>st+i);}
+function castleOf(k){return CASTLES[Math.floor((k-1)/52)];}
+function familyOf(k){return "Família "+FAMILIES[sealOf(k)%5];}
+function clanOf(k){const s=sealOf(k);return CLANS[s===20?0:s<=4?0:s<=9?1:s<=14?2:3];}
+function affirmationOf(k){
+  const s=SEALS[sealOf(k)-1],t=TONES[toneOf(k)-1],o=oracleOf(k);
+  const cell=CELLS[Math.ceil(sealOf(k)/4)-1];
+  const guide=o.selfGuided?"pelo meu próprio poder duplicado":"pelo poder "+SEALS[sealOf(o.guide)-1].powerDe;
+  return ["Eu "+t.verb+" com o fim de "+s.act,
+          t.ger+" "+s.essObj,
+          "Eu selo "+cell+" "+s.powerDe,
+          "Com o tom "+t.name+" "+t.powerDe,
+          "Eu sou guiado "+guide];
+}
+/* 13 luas */
+function moonInfo(y,m,d){
+  const sy=(m>7||(m===7&&d>=26))?y:y-1;
+  const yearKin=kinFor(sy,7,26);
+  if(m===7&&d===25) return {special:"Dia Fora do Tempo",sy,yearKin};
+  if(m===2&&d===29) return {special:"0.0 Hunab Ku",sy,yearKin};
+  const doy=Math.round((utc(y,m,d)-utc(sy,7,26))/MS)-(leapsUpTo(y,m,d)-leapsUpTo(sy,7,26));
+  return {moon:Math.floor(doy/28)+1, day:doy%28+1, sy, yearKin};
+}
+function moonStartDate(sy,idx){ /* idx 0-12 */
+  const [mm,dd]=MOON_STARTS[idx]; const yy=(mm>=7)?sy:sy+1; return {y:yy,m:mm,d:dd};
+}
+function addDays(o,n){const t=new Date(utc(o.y,o.m,o.d)+n*MS);return {y:t.getUTCFullYear(),m:t.getUTCMonth()+1,d:t.getUTCDate()};}
+function nextDateOfKin(kin,from){
+  let o={...from};
+  for(let i=0;i<800;i++){ if(kinFor(o.y,o.m,o.d)===kin) return o; o=addDays(o,1); }
+  return null;
+}
+function todayYMD(){const n=new Date();return {y:n.getFullYear(),m:n.getMonth()+1,d:n.getDate()};}
+const sameYMD=(a,b)=>a.y===b.y&&a.m===b.m&&a.d===b.d;
+function fmtDate(o,withWeek){
+  const w=WEEKDAYS[new Date(utc(o.y,o.m,o.d)).getUTCDay()];
+  const base=o.d+" de "+MONTHS_PT[o.m-1]+" de "+o.y;
+  return withWeek?(w+", "+base):base;
+}
+const pad=n=>String(n).padStart(2,"0");
+const toInput=o=>o.y+"-"+pad(o.m)+"-"+pad(o.d);
+function fromInput(v){const [y,m,d]=v.split("-").map(Number);return {y,m,d};}
+
+/* ================= SVG helpers ================= */
+function glyphSVG(k,extra){
+  const c=COLORS[colorOf(k)].hex;
+  return '<svg viewBox="0 0 48 48" fill="none" stroke="'+(extra||c)+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="'+GLYPHS[sealOf(k)-1]+'"/></svg>';
+}
+function toneSVG(t,color){
+  const bars=Math.floor(t/5), dots=t%5, w=64;
+  let s='<svg viewBox="0 0 '+w+' 26" width="'+(w*0.9)+'" height="24" fill="'+color+'" stroke="none">';
+  const dw=dots*12-4, dx0=(w-(dots?dw:0))/2;
+  for(let i=0;i<dots;i++) s+='<circle cx="'+(dx0+4+i*12)+'" cy="6" r="3.6"/>';
+  for(let b=0;b<bars;b++) s+='<rect x="'+((w-44)/2)+'" y="'+(13+b*7)+'" width="44" height="4.6" rx="2.3"/>';
+  return s+"</svg>";
+}
+
+/* ================= ESTADO ================= */
+let shownDate=todayYMD();
+let curTab="hoje";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ================= RENDER: painel de kin ================= */
+function kinHeroHTML(k,ctx){
+  const c=COLORS[colorOf(k)], gap=GAP.has(k);
+  const s=SEALS[sealOf(k)-1], t=TONES[toneOf(k)-1], cast=castleOf(k);
+  return '<div class="card hero" style="--sealC:'+c.hex+';--sealGlow:'+c.hex+'2b">'+
+    '<div class="halo"></div>'+
+    (ctx?'<div class="kinNum">'+esc(ctx)+'</div>':"")+
+    '<div class="glyphRing">'+glyphSVG(k)+'</div>'+
+    '<div class="kinNum">Kin <b>'+k+'</b></div>'+
+    '<div class="kinName">'+esc(kinName(k))+'</div>'+
+    '<div class="toneRow">'+toneSVG(toneOf(k),c.hex)+'</div>'+
+    '<div class="kinSub">Selo '+sealOf(k)+' · '+esc(s.maya)+' · Tom '+toneOf(k)+', poder '+esc(t.powerDe)+'</div>'+
+    '<div class="badges">'+
+      (gap?'<span class="badge portal">✦ Portal de Ativação Galáctica</span>':"")+
+      '<span class="badge seal">'+esc(c.n)+": "+esc(c.faz)+'</span>'+
+      '<span class="badge">'+esc(familyOf(k))+'</span>'+
+      '<span class="badge">'+esc(clanOf(k))+'</span>'+
+      '<span class="badge" style="color:'+cast.hex+'aa">'+esc(cast.n)+'</span>'+
+    '</div></div>';
+}
+function oracleHTML(k){
+  const o=oracleOf(k);
+  const cell=(kk,role,cls)=>{
+    const c=COLORS[colorOf(kk)].hex;
+    return '<div class="ocell '+cls+'" data-kin="'+kk+'" style="border-color:'+c+'55">'+
+      '<div class="role">'+role+'</div>'+glyphSVG(kk)+
+      '<div class="oname">'+esc(kinName(kk))+'</div><div class="okin">Kin '+kk+'</div></div>';
+  };
+  return '<div class="card"><h3>Oráculo do Destino</h3><div class="oracle">'+
+    cell(o.guide,"Guia","o-g")+cell(o.antipode,"Antípoda","o-ant")+
+    cell(k,"Destino","o-c center")+cell(o.analog,"Análogo","o-ana")+
+    cell(o.occult,"Oculto","o-oc")+'</div></div>';
+}
+function affirmHTML(k){
+  return '<div class="card"><h3>Afirmação</h3><p class="affirm">'+
+    affirmationOf(k).map(esc).join("<br>")+
+    '<span class="inlakech">In Lak\'ech · eu sou outro você</span></p></div>';
+}
+function waveStripHTML(k){
+  const ws=waveOf(k), wsName=kinName(ws[0]);
+  return '<div class="card"><h3>Onda Encantada <small>· '+esc(wsName)+' · posição '+toneOf(k)+' de 13</small></h3>'+
+    '<div class="waveStrip">'+ws.map(kk=>'<div class="w'+(kk===k?" cur":"")+'" data-kin="'+kk+'" style="background:'+COLORS[colorOf(kk)].hex+'">'+toneOf(kk)+'</div>').join("")+'</div></div>';
+}
+function kinPanelHTML(k,ctx){
+  return kinHeroHTML(k,ctx)+oracleHTML(k)+affirmHTML(k)+waveStripHTML(k);
+}
+
+/* ================= VIEW: HOJE ================= */
+function render13MoonCard(o){
+  const mi=moonInfo(o.y,o.m,o.d);
+  let inner;
+  if(mi.special){
+    inner='<div class="ibox" style="grid-column:1/-1"><div class="k">Dia especial</div><div class="v">'+esc(mi.special)+'</div></div>';
+  }else{
+    const M=MOONS[mi.moon-1], pl=PLASMAS[(mi.day-1)%7], hep=Math.ceil(mi.day/7);
+    inner=
+     '<div class="ibox"><div class="k">Lua</div><div class="v">Lua '+mi.moon+" "+esc(M.n)+'<br><small>'+esc(M.q)+'</small></div></div>'+
+     '<div class="ibox"><div class="k">Dia da lua</div><div class="v">'+mi.day+' de 28 <small>· '+esc(HEPTADS[hep-1])+'</small></div></div>'+
+     '<div class="ibox"><div class="k">Plasma radial</div><div class="v">'+esc(pl.n)+' <small>· '+esc(pl.v)+' · chakra '+esc(pl.c)+'</small></div></div>';
+  }
+  const yk=mi.yearKin;
+  inner+='<div class="ibox"><div class="k">Ano (portador)</div><div class="v">'+esc(kinName(yk))+' <small>· Kin '+yk+' · NS desde 26/7/'+mi.sy+'</small></div></div>';
+  return '<div class="card"><h3>Sincronário das 13 Luas</h3><div class="igrid">'+inner+'</div></div>';
+}
+function renderHoje(){
+  const o=shownDate, k=kinFor(o.y,o.m,o.d), isToday=sameYMD(o,todayYMD());
+  const jumps=[-260,-52,-28,-13,-7,-1,0,1,7,13,28,52,260];
+  let h='<div class="datebar">'+
+    '<button class="btn" data-nav="-1" title="dia anterior">‹</button>'+
+    '<input type="date" id="dateInput" value="'+toInput(o)+'">'+
+    '<button class="btn" data-nav="1" title="próximo dia">›</button></div>'+
+    '<div class="jumps">'+jumps.map(j=>j===0
+      ?'<button class="chip today" data-jump="hoje">Hoje</button>'
+      :'<button class="chip" data-jump="'+j+'">'+(j>0?"+":"")+j+'</button>').join("")+'</div>';
+  if(k===0){
+    h+='<div class="card hero"><div class="glyphRing" style="--sealC:#5fc08b">'+
+       '<svg viewBox="0 0 48 48" fill="none" stroke="#5fc08b" stroke-width="2.4"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="6"/></svg></div>'+
+       '<div class="kinNum">'+esc(fmtDate(o,true))+'</div>'+
+       '<div class="kinName">0.0 Hunab Ku</div>'+
+       '<div class="kinSub">29 de fevereiro: dia fora da contagem de kins. Dia de vacuidade e presença pura.</div></div>';
+    h+=render13MoonCard(o);
+  }else{
+    h+=kinPanelHTML(k,fmtDate(o,true)+(isToday?" · hoje":""));
+    h+=render13MoonCard(o);
+  }
+  $("view-hoje").innerHTML=h;
+  $("dateInput").addEventListener("change",e=>{if(e.target.value){shownDate=fromInput(e.target.value);renderAll();}});
+}
+
+/* ================= VIEW: TZOLKIN ================= */
+function renderTzolkin(){
+  const tk=kinFor(shownDate.y,shownDate.m,shownDate.d);
+  let cells="";
+  for(let col=0;col<13;col++)for(let row=0;row<20;row++){
+    const k=col*20+row+1;
+    const cls=["c"]; if(GAP.has(k))cls.push("gap"); if(k===tk)cls.push("now"); if(col===6)cls.push("mystic");
+    cells+='<div class="'+cls.join(" ")+'" data-kin="'+k+'" style="background:'+COLORS[colorOf(k)].hex+'" title="Kin '+k+": "+esc(kinName(k))+'">'+k+'</div>';
+  }
+  /* grid é column-major: gera na ordem rows dentro de col, então uso grid-auto-flow:column com 20 linhas e insiro já na ordem certa */
+  $("view-tzolkin").innerHTML=
+   '<div class="card"><h3>Tzolkin · Módulo Harmônico 13:20</h3>'+
+   '<div class="tzWrap"><div class="tz">'+cells+'</div></div>'+
+   '<div class="legend">'+
+   '<span><i style="background:#e05252"></i>Vermelho</span><span><i style="background:#efe9dc"></i>Branco</span>'+
+   '<span><i style="background:#5b95e6"></i>Azul</span><span><i style="background:#eec84f"></i>Amarelo</span>'+
+   '<span><i style="background:none;border:1.5px solid #8f96b5;border-radius:4px"></i>Portal de Ativação</span>'+
+   '<span><i style="background:#ffffff55"></i>Coluna mística (7ª)</span>'+
+   '<span><i style="background:none;outline:2px solid #fff;outline-offset:-1px;border-radius:4px"></i>Data selecionada</span>'+
+   '</div><p class="hint">Toque em qualquer kin para abrir o painel completo dele.</p></div>';
+}
+
+/* ================= VIEW: ONDA ================= */
+function renderOnda(){
+  const k=kinFor(shownDate.y,shownDate.m,shownDate.d);
+  if(k===0){$("view-onda").innerHTML='<div class="card"><h3>Onda Encantada</h3><p class="hint">29/02 é o dia 0.0 Hunab Ku, fora da contagem. Navegue para outra data na aba Hoje.</p></div>';return;}
+  const ws=waveOf(k), start=ws[0], cast=castleOf(start);
+  const rows=ws.map((kk,i)=>{
+    const c=COLORS[colorOf(kk)].hex;
+    return '<div class="wrow'+(kk===k?" cur":"")+'" data-kin="'+kk+'">'+
+     '<span class="pos">'+(i+1)+'</span>'+glyphSVG(kk)+
+     '<span class="nm">'+esc(kinName(kk))+'<small>'+esc(TONES[i].role)+'</small></span>'+
+     '<span class="kn">Kin '+kk+(GAP.has(kk)?" ✦":"")+'</span></div>';
+  }).join("");
+  $("view-onda").innerHTML=
+   '<div class="card"><h3>Onda Encantada '+esc(kinName(start).replace(/ (Magnétic[oa]|Magnética)/,""))+' <small>· kins '+ws[0]+' a '+ws[12]+'</small></h3>'+
+   '<p class="hint" style="text-align:left;margin:0 0 12px">Ciclo de 13 dias do propósito (tom 1) à presença (tom 13). '+esc(cast.n)+", "+esc(cast.sub)+'. ✦ = portal de ativação galáctica.</p>'+
+   '<div class="waveList">'+rows+'</div></div>';
+}
+
+/* ================= VIEW: 13 LUAS ================= */
+function renderLuas(){
+  const o=shownDate, mi=moonInfo(o.y,o.m,o.d);
+  const curMoon=mi.moon||0;
+  let list="";
+  for(let i=0;i<13;i++){
+    const st=moonStartDate(mi.sy,i), en=addDays(st,27);
+    list+='<div class="mrow'+(i+1===curMoon?" cur":"")+'"><span class="n">'+(i+1)+'</span>'+
+     '<span class="info">Lua '+esc(MOONS[i].n)+'<small>'+esc(MOONS[i].q)+'</small></span>'+
+     '<span class="dt">'+pad(st.d)+"/"+pad(st.m)+" a "+pad(en.d)+"/"+pad(en.m)+'</span></div>';
+  }
+  let grid="";
+  if(curMoon){
+    const st=moonStartDate(mi.sy,curMoon-1);
+    grid='<div class="card"><h3>Lua '+curMoon+" "+esc(MOONS[curMoon-1].n)+' <small>· 28 dias</small></h3><div class="moonGrid">'+
+      PLASMAS.map(p=>'<div class="h">'+p.n+'</div>').join("");
+    let cur={...st};
+    for(let d=1;d<=28;d++){
+      /* pular 29/02 na contagem */
+      while(cur.m===2&&cur.d===29) cur=addDays(cur,1);
+      const kk=kinFor(cur.y,cur.m,cur.d);
+      grid+='<div class="d'+(d===mi.day?" now":"")+'" data-date="'+toInput(cur)+'">'+
+        '<span class="dm">'+d+'</span><i style="background:'+COLORS[colorOf(kk)].hex+'"></i><span class="gg">'+pad(cur.d)+"/"+pad(cur.m)+'</span></div>';
+      cur=addDays(cur,1);
+    }
+    grid+='</div><p class="hint">Colunas = plasmas radiais (Dali a Sílio). Toque num dia para abri-lo na aba Hoje.</p></div>';
+  }else{
+    grid='<div class="card"><p class="hint">'+esc(mi.special)+': dia fora da estrutura das 13 luas.</p></div>';
+  }
+  $("view-luas").innerHTML=
+   '<div class="card"><h3>Ano das 13 Luas <small>· 26/7/'+mi.sy+' a 24/7/'+(mi.sy+1)+' · portador: '+esc(kinName(mi.yearKin))+'</small></h3><div class="moonList">'+list+'</div></div>'+grid;
+}
+
+/* ================= VIEW: PERFIS ================= */
+const PKEY="sincronario.profiles";
+const loadProfiles=()=>{try{return JSON.parse(localStorage.getItem(PKEY))||[]}catch(e){return []}};
+const saveProfiles=p=>localStorage.setItem(PKEY,JSON.stringify(p));
+function renderPerfis(){
+  const ps=loadProfiles();
+  let rows=ps.map(p=>{
+    const k=kinFor(p.y,p.m,p.d);
+    const c=COLORS[colorOf(k||1)].hex;
+    const nx=k?nextDateOfKin(k,todayYMD()):null;
+    return '<div class="prow" style="--sealC:'+c+'">'+
+      '<input type="checkbox" class="sel" data-id="'+p.id+'">'+
+      '<span class="av" data-pkin="'+(k||0)+'">'+(k?glyphSVG(k):"✳")+'</span>'+
+      '<span class="pi" data-pkin="'+(k||0)+'"><b>'+esc(p.name)+'</b>'+
+      '<span>'+pad(p.d)+"/"+pad(p.m)+"/"+p.y+(k?" · Kin "+k+" · "+esc(kinName(k)):" · 0.0 Hunab Ku")+'</span>'+
+      (nx?'<span>Aniversário galáctico: '+esc(fmtDate(nx))+'</span>':"")+
+      '</span><button class="del" data-del="'+p.id+'" title="remover">🗑</button></div>';
+  }).join("");
+  $("view-perfis").innerHTML=
+   '<div class="card"><h3>Calcular Kin de Nascimento</h3>'+
+   '<div class="pform"><input id="pName" placeholder="Nome" maxlength="30">'+
+   '<input id="pDate" type="date"><button class="btn gold" id="pAdd">Calcular e salvar</button></div>'+
+   '<p class="hint">O kin fica salvo neste aparelho. Toque no nome para ver o painel completo.</p></div>'+
+   (ps.length?'<div class="card"><h3>Meus Kins</h3><div class="plist">'+rows+'</div>'+
+     '<div class="relbar"><button class="btn gold" id="relBtn">♥ Kin da Relação (marque 2)</button></div>'+
+     '<p class="hint">Marque duas pessoas e toque no botão: o kin da relação é a soma dos dois kins no giro de 260.</p></div>':"");
+  $("pAdd").addEventListener("click",()=>{
+    const nm=$("pName").value.trim(), dt=$("pDate").value;
+    if(!nm||!dt){alert("Preencha nome e data de nascimento.");return;}
+    const o=fromInput(dt), ps2=loadProfiles();
+    ps2.push({id:Date.now()+""+Math.floor(Math.random()*999),name:nm,...o});
+    saveProfiles(ps2); renderPerfis();
+    const k=kinFor(o.y,o.m,o.d); if(k)openKinModal(k,"Nascimento: "+fmtDate(o));
+  });
+  const rb=$("relBtn");
+  if(rb) rb.addEventListener("click",()=>{
+    const sel=[...document.querySelectorAll(".prow .sel:checked")].map(x=>x.dataset.id);
+    if(sel.length!==2){alert("Marque exatamente 2 pessoas.");return;}
+    const all=loadProfiles(), a=all.find(p=>p.id===sel[0]), b=all.find(p=>p.id===sel[1]);
+    const ka=kinFor(a.y,a.m,a.d), kb=kinFor(b.y,b.m,b.d);
+    if(!ka||!kb){alert("Uma das datas é 29/02 (Hunab Ku), sem kin.");return;}
+    let kr=(ka+kb)%260; if(kr===0)kr=260;
+    openKinModal(kr,"Kin da Relação: "+esc(a.name)+" (Kin "+ka+") + "+esc(b.name)+" (Kin "+kb+")");
+  });
+}
+
+/* ================= MODAL ================= */
+function openKinModal(k,ctx){
+  const nx=nextDateOfKin(k,todayYMD());
+  $("modalBody").innerHTML=kinPanelHTML(k,ctx||"")+
+    (nx?'<div class="card"><h3>Próxima ocorrência</h3><p style="font-size:.92rem">'+esc(fmtDate(nx,true))+
+    ' <button class="btn" style="margin-left:8px" data-goto="'+toInput(nx)+'">Abrir na aba Hoje</button></p></div>':"");
+  $("overlay").classList.add("open");
+  $("overlay").scrollTop=0;
+}
+function closeModal(){$("overlay").classList.remove("open");}
+
+/* ================= NAVEGAÇÃO ================= */
+function renderAll(){
+  $("hdrDate").innerHTML=fmtDate(shownDate,true).replace(", ","<br>");
+  ({hoje:renderHoje,tzolkin:renderTzolkin,onda:renderOnda,luas:renderLuas,perfis:renderPerfis})[curTab]();
+}
+function switchTab(tab){
+  curTab=tab;
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+tab));
+  renderAll();
+  window.scrollTo({top:0});
+}
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)switchTab(b.dataset.tab);});
+document.addEventListener("click",e=>{
+  const nav=e.target.closest("[data-nav]");
+  if(nav){shownDate=addDays(shownDate,Number(nav.dataset.nav));renderAll();return;}
+  const jp=e.target.closest("[data-jump]");
+  if(jp){shownDate=jp.dataset.jump==="hoje"?todayYMD():addDays(shownDate,Number(jp.dataset.jump));renderAll();return;}
+  const gt=e.target.closest("[data-goto]");
+  if(gt){shownDate=fromInput(gt.dataset.goto);closeModal();switchTab("hoje");return;}
+  const dd=e.target.closest(".moonGrid .d[data-date]");
+  if(dd){shownDate=fromInput(dd.dataset.date);switchTab("hoje");return;}
+  const del=e.target.closest("[data-del]");
+  if(del){saveProfiles(loadProfiles().filter(p=>p.id!==del.dataset.del));renderPerfis();return;}
+  const pk=e.target.closest("[data-pkin]");
+  if(pk&&Number(pk.dataset.pkin)>0){openKinModal(Number(pk.dataset.pkin));return;}
+  const kc=e.target.closest("[data-kin]");
+  if(kc){openKinModal(Number(kc.dataset.kin));return;}
+});
+$("closeModal").addEventListener("click",closeModal);
+$("overlay").addEventListener("click",e=>{if(e.target===e.currentTarget)closeModal();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+
+renderAll();
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
