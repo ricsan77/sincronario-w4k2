@@ -802,6 +802,7 @@ const loadProfiles=()=>{try{return JSON.parse(localStorage.getItem(PKEY))||[]}ca
 const saveProfiles=p=>localStorage.setItem(PKEY,JSON.stringify(p));
 function renderPerfis(){
   const ps=loadProfiles();
+  const tn=todayYMD(), todayK=kinFor(tn.y,tn.m,tn.d);
   let rows=ps.map(p=>{
     const k=kinFor(p.y,p.m,p.d);
     const c=COLORS[colorOf(k||1)].hex;
@@ -811,6 +812,7 @@ function renderPerfis(){
       '<span class="av" data-pid="'+p.id+'">'+(k?glyphSVG(k):"✳")+'</span>'+
       '<span class="pi" data-pid="'+p.id+'"><b>'+esc(p.name)+'</b>'+
       '<span>'+pad(p.d)+"/"+pad(p.m)+"/"+p.y+(k?" · Kin "+k+" · "+esc(kinName(k)):" · 0.0 Hunab Ku")+'</span>'+
+      (k&&todayK?'<span style="color:#c9b06a">Trânsito hoje: Kin '+transitKin(k,todayK)+' · '+esc(kinName(transitKin(k,todayK)))+'</span>':"")+
       (nx?'<span>Aniversário galáctico: '+esc(fmtDate(nx))+'</span>':"")+
       '</span><button class="del" data-del="'+p.id+'" title="remover">🗑</button></div>';
   }).join("");
@@ -843,28 +845,50 @@ function renderPerfis(){
 }
 
 /* ================= MODAL ================= */
+function transitKin(a,b){const t=(a+b)%260;return t===0?260:t;}
+function birthdayIn(birth,age){
+  const by=birth.y+age;
+  if(birth.m===2&&birth.d===29){const L=(by%4===0&&by%100!==0)||by%400===0;if(!L)return {y:by,m:2,d:28};}
+  return {y:by,m:birth.m,d:birth.d};
+}
+function ageNow(birth){
+  const t=todayYMD();
+  let a=t.y-birth.y-((t.m<birth.m||(t.m===birth.m&&t.d<birth.d))?1:0);
+  return a<0?0:a;
+}
+function transitCardHTML(natal){
+  const t=todayYMD(), dk=kinFor(t.y,t.m,t.d);
+  if(!dk) return "";
+  const tk=transitKin(natal,dk), c=COLORS[colorOf(tk)];
+  return '<div class="card"><h3>Kin de Trânsito de Hoje <small>· kin natal + kin do dia</small></h3><div class="igrid">'+
+   '<div class="ibox"><div class="k">Fórmula</div><div class="v">Kin '+natal+' (natal) + Kin '+dk+' (hoje)</div></div>'+
+   '<div class="ibox" data-kin="'+tk+'" style="cursor:pointer;border-color:'+c.hex+'66"><div class="k">Trânsito</div><div class="v"><span style="color:'+c.hex+'">Kin '+tk+' · '+esc(kinName(tk))+'</span><br><small>a energia que o dia acende no seu kin · toque para abrir</small></div></div>'+
+   '</div></div>';
+}
 function destinyPathHTML(birth){
-  const today=todayYMD();
-  let curAge=today.y-birth.y-((today.m<birth.m||(today.m===birth.m&&today.d<birth.d))?1:0);
-  if(curAge<0)curAge=0;
-  let chips="";
-  for(let age=0;age<=104;age++){
-    const by=birth.y+age;
-    let bd={y:by,m:birth.m,d:birth.d};
-    if(birth.m===2&&birth.d===29){const leap=(by%4===0&&by%100!==0)||by%400===0; if(!leap)bd={y:by,m:2,d:28};}
-    const kk=kinFor(bd.y,bd.m,bd.d);
-    if(!kk)continue;
-    chips+='<div class="age'+(age===curAge?" cur":"")+'" data-kin="'+kk+'" style="border-color:'+COLORS[colorOf(kk)].hex+'44">'+
-      '<div class="a">'+age+' anos · '+by+'</div><div class="k" style="color:'+COLORS[colorOf(kk)].hex+'">Kin '+kk+'</div></div>';
+  const curAge=ageNow(birth);
+  const bdNow=birthdayIn(birth,curAge);
+  const annual=kinFor(bdNow.y,bdNow.m,bdNow.d);
+  const ci=Math.floor(curAge/13), pos=curAge%13+1, cc=COLORS[ci%4];
+  let h='<div class="card"><h3>Castelo do Destino <small>· ondas de 13 anos · volta ao kin natal aos 52</small></h3>';
+  if(annual) h+='<div class="ibox" style="margin-bottom:6px"><div class="k">Ano em curso (kin anual de trânsito)</div><div class="v">'+curAge+' anos · Kin '+annual+' · '+esc(kinName(annual))+'<br><small>Onda do destino '+(ci+1)+' · <span style="color:'+cc.hex+'">corte '+esc(cc.fem.toLowerCase())+'</span> · ano '+pos+' de 13 · tom '+esc(TONES[pos-1].name)+" "+esc(TONES[pos-1].powerDe)+'</small></div></div>';
+  for(let c=0;c<8;c++){
+    const col=COLORS[c%4];
+    h+='<div style="margin:12px 0 6px;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:'+col.hex+'">Onda '+(c+1)+' · '+(c*13)+' a '+(c*13+12)+' anos · '+(c<4?"1º":"2º")+' castelo</div><div class="pathGrid">';
+    for(let i=0;i<13;i++){
+      const age=c*13+i, bd=birthdayIn(birth,age), kk=kinFor(bd.y,bd.m,bd.d);
+      if(!kk)continue;
+      h+='<div class="age'+(age===curAge?" cur":"")+'" data-kin="'+kk+'" style="border-color:'+COLORS[colorOf(kk)].hex+'44">'+
+        '<div class="a">'+age+' anos · tom '+(i+1)+'</div><div class="k" style="color:'+COLORS[colorOf(kk)].hex+'">Kin '+kk+'</div></div>';
+    }
+    h+='</div>';
   }
-  return '<div class="card"><h3>Caminho do Destino <small>· o kin de cada aniversário · volta ao kin natal aos 52</small></h3>'+
-    '<div class="pathGrid">'+chips+'</div>'+
-    '<p class="hint">O ano atual está destacado em dourado. Toque num ano para abrir o kin dele.</p></div>';
+  return h+'<p class="hint">Cada onda de 13 anos leva do tom Magnético (propósito) ao Cósmico (presença); aos 52 anos fecha o castelo e o kin natal retorna. O ano atual está em dourado; toque num ano para abrir o kin dele.</p></div>';
 }
 function openKinModal(k,ctx,birth){
   const nx=nextDateOfKin(k,todayYMD());
   $("modalBody").innerHTML=kinPanelHTML(k,ctx||"")+
-    (birth?destinyPathHTML(birth):"")+
+    (birth?transitCardHTML(k)+destinyPathHTML(birth):"")+
     (nx?'<div class="card"><h3>Próxima ocorrência</h3><p style="font-size:.92rem">'+esc(fmtDate(nx,true))+
     ' <button class="btn" style="margin-left:8px" data-goto="'+toInput(nx)+'">Abrir na aba Hoje</button></p></div>':"");
   $("overlay").classList.add("open");
