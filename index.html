@@ -81,8 +81,8 @@ main{max-width:980px;margin:0 auto;padding:16px 14px 30px}
   box-shadow:0 6px 20px #00000040;transition:transform .15s;
 }
 .ownerBar:hover{transform:translateY(-1px)}
-.ownerBar .av{width:46px;height:46px;border-radius:50%;border:1.6px solid var(--sealC);display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:#00000030}
-.ownerBar .av svg{width:26px;height:26px;color:var(--sealC)}
+.ownerBar .av{width:48px;height:48px;border-radius:13px;overflow:hidden;display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:#00000030}
+.ownerBar .av svg{width:48px;height:48px;display:block}
 .ownerBar .oi{flex:1;min-width:0}
 .ownerBar .oi b{font-family:var(--font-display);font-size:.98rem;display:block;line-height:1.25}
 .ownerBar .oi span{font-size:.74rem;color:var(--ink-dim);display:block;line-height:1.4}
@@ -123,13 +123,11 @@ main{max-width:980px;margin:0 auto;padding:16px 14px 30px}
   background:radial-gradient(ellipse 60% 55% at 50% 30%, var(--sealGlow, #e8b84b22), transparent 70%);
 }
 .glyphRing{
-  position:relative;width:118px;height:118px;margin:0 auto 12px;border-radius:50%;
+  width:108px;height:108px;margin:0 auto 12px;border-radius:25px;
   display:flex;align-items:center;justify-content:center;
-  border:2px solid var(--sealC,#e8b84b);
-  box-shadow:0 0 0 6px color-mix(in srgb, var(--sealC,#e8b84b) 14%, transparent), 0 0 40px color-mix(in srgb, var(--sealC,#e8b84b) 35%, transparent);
-  background:radial-gradient(circle at 50% 38%, #ffffff10, #00000035);
+  box-shadow:0 12px 34px color-mix(in srgb, var(--sealC,#e8b84b) 36%, transparent);
 }
-.glyphRing svg{width:64px;height:64px;color:var(--sealC,#e8b84b)}
+.glyphRing svg{width:108px;height:108px;display:block}
 .kinNum{
   font-family:var(--font-display);font-size:.85rem;letter-spacing:.3em;color:var(--ink-dim);
   text-transform:uppercase;margin-bottom:4px;
@@ -239,10 +237,10 @@ main{max-width:980px;margin:0 auto;padding:16px 14px 30px}
 .prow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#00000025}
 .prow .sel{width:20px;height:20px;accent-color:var(--gold);cursor:pointer}
 .prow .av{
-  width:44px;height:44px;border-radius:50%;border:1.5px solid var(--sealC);display:flex;
+  width:46px;height:46px;border-radius:12px;display:flex;overflow:hidden;
   align-items:center;justify-content:center;flex:0 0 auto;cursor:pointer;background:#00000030;
 }
-.prow .av svg{width:24px;height:24px;color:var(--sealC)}
+.prow .av svg{width:46px;height:46px;display:block}
 .prow .pi{flex:1;cursor:pointer;min-width:0}
 .prow .pi b{display:block;font-size:.95rem}
 .prow .pi span{font-size:.75rem;color:var(--ink-dim);display:block;line-height:1.35}
@@ -575,10 +573,13 @@ const toInput=o=>o.y+"-"+pad(o.m)+"-"+pad(o.d);
 function fromInput(v){const [y,m,d]=v.split("-").map(Number);return {y,m,d};}
 
 /* ================= SVG helpers ================= */
-function glyphSVG(k,extra){
-  const c=extra||COLORS[colorOf(k)].hex, g=GLYPHS[sealOf(k)-1];
-  let inner='<path d="'+g.s+'" fill="none" stroke="'+c+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
-  inner+=(g.f||[]).map(f=>'<circle cx="'+f[0]+'" cy="'+f[1]+'" r="'+f[2]+'" fill="'+c+'"/>').join("");
+/* selo na notação de Argüelles: glifo escuro no quadrado da cor do selo */
+const SEAL_INK="#17150e";
+function glyphSVG(k){
+  const c=COLORS[colorOf(k)].hex, g=GLYPHS[sealOf(k)-1];
+  let inner='<rect width="48" height="48" rx="11" fill="'+c+'"/>';
+  inner+='<path d="'+g.s+'" fill="none" stroke="'+SEAL_INK+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
+  inner+=(g.f||[]).map(f=>'<circle cx="'+f[0]+'" cy="'+f[1]+'" r="'+(f[2]+0.4)+'" fill="'+SEAL_INK+'"/>').join("");
   return '<svg viewBox="0 0 48 48">'+inner+'</svg>';
 }
 function toneSVG(t,color){
