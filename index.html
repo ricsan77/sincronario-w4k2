@@ -73,6 +73,26 @@ main{max-width:980px;margin:0 auto;padding:16px 14px 30px}
 }
 .card h3 small{color:var(--ink-dim);letter-spacing:.05em;font-family:var(--font-body);text-transform:none;font-weight:400}
 
+/* ---------- owner (meu kin) ---------- */
+.ownerBar{
+  display:flex;align-items:center;gap:12px;border:1px solid var(--sealC,#e8b84b);
+  border-radius:16px;padding:11px 14px;margin-bottom:14px;cursor:pointer;
+  background:linear-gradient(135deg, color-mix(in srgb, var(--sealC,#e8b84b) 16%, transparent), #00000022);
+  box-shadow:0 6px 20px #00000040;transition:transform .15s;
+}
+.ownerBar:hover{transform:translateY(-1px)}
+.ownerBar .av{width:46px;height:46px;border-radius:50%;border:1.6px solid var(--sealC);display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:#00000030}
+.ownerBar .av svg{width:26px;height:26px;color:var(--sealC)}
+.ownerBar .oi{flex:1;min-width:0}
+.ownerBar .oi b{font-family:var(--font-display);font-size:.98rem;display:block;line-height:1.25}
+.ownerBar .oi span{font-size:.74rem;color:var(--ink-dim);display:block;line-height:1.4}
+.ownerBar .go{font-size:.66rem;color:var(--sealC);white-space:nowrap;letter-spacing:.05em}
+.setupCard{border:1px dashed var(--gold-dim);border-radius:16px;padding:16px;margin-bottom:14px;background:#e8b84b0c;text-align:center}
+.setupCard h4{font-family:var(--font-display);font-size:.9rem;color:var(--gold);margin-bottom:6px}
+.setupCard p{font-size:.8rem;color:var(--ink-dim);margin-bottom:12px;line-height:1.5}
+.setupCard .pform{grid-template-columns:1fr 1fr;gap:8px}
+.setupCard .pform .btn{grid-column:1/-1}
+.badge.owner{color:var(--gold);border-color:#e8b84b88;background:#e8b84b1a;font-weight:600}
 /* ---------- date bar ---------- */
 .datebar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .datebar input[type=date]{
@@ -228,6 +248,7 @@ main{max-width:980px;margin:0 auto;padding:16px 14px 30px}
 .prow .pi span{font-size:.75rem;color:var(--ink-dim);display:block;line-height:1.35}
 .prow .del{background:none;border:none;color:#77618a;font-size:1.1rem;cursor:pointer;padding:6px}
 .prow .del:hover{color:var(--red)}
+.prow.ownd{border-color:var(--gold);background:#e8b84b10}
 .relbar{margin-top:12px;display:flex;justify-content:center}
 .hint{font-size:.78rem;color:var(--ink-dim);text-align:center;margin-top:10px;line-height:1.5}
 
@@ -622,6 +643,46 @@ function kinPanelHTML(k,ctx){
   return kinHeroHTML(k,ctx)+oracleHTML(k)+affirmHTML(k)+waveStripHTML(k);
 }
 
+/* ================= DONO (MEU KIN) ================= */
+const OKEY="sincronario.owner";
+const loadOwner=()=>{try{return JSON.parse(localStorage.getItem(OKEY))||null}catch(e){return null}};
+const saveOwner=o=>localStorage.setItem(OKEY,JSON.stringify(o));
+const clearOwner=()=>localStorage.removeItem(OKEY);
+const toneQ=t=>MOONS[t-1].q.replace("o meu","meu").replace("O meu","Meu"); /* pergunta do tom = pergunta da lua homônima */
+function daysUntil(o){return Math.round((utc(o.y,o.m,o.d)-utc(todayYMD().y,todayYMD().m,todayYMD().d))/MS);}
+function ownerBannerHTML(){
+  const ow=loadOwner(); if(!ow)return "";
+  const k=kinFor(ow.y,ow.m,ow.d);
+  if(!k) return '<div class="ownerBar" data-owner="1" style="--sealC:#5fc08b"><div class="av">✳</div><div class="oi"><b>'+esc(ow.name)+'</b><span>Nasceu em 29/02 · 0.0 Hunab Ku</span></div><div class="go">ver ›</div></div>';
+  const c=COLORS[colorOf(k)];
+  return '<div class="ownerBar" data-owner="1" style="--sealC:'+c.hex+'">'+
+    '<div class="av">'+glyphSVG(k)+'</div>'+
+    '<div class="oi"><b>Kin '+k+' · '+esc(kinName(k))+'</b>'+
+    '<span>'+esc(ow.name)+' · '+esc(familyOf(k))+' · Onda '+esc(kinName(waveOf(k)[0]).replace(/ (Magnétic[oa]) .*/,""))+'</span></div>'+
+    '<div class="go">meu caminho ›</div></div>';
+}
+function ownerDayHTML(dayKin){
+  const ow=loadOwner(); if(!ow||dayKin===0)return "";
+  const nk=kinFor(ow.y,ow.m,ow.d); if(!nk)return "";
+  const tk=transitKin(nk,dayKin), tc=COLORS[colorOf(tk)];
+  const age=ageNow(ow), bd=birthdayIn(ow,age), annual=kinFor(bd.y,bd.m,bd.d);
+  const ci=Math.floor(age/13), pos=age%13+1;
+  /* próximo renascimento galáctico: retorno do kin natal (idade múltipla de 52) */
+  const nextRet=age<52?52:104;
+  const retDate=birthdayIn(ow,nextRet), retDays=daysUntil(retDate);
+  let inner=
+    '<div class="ibox" data-kin="'+tk+'" style="cursor:pointer;border-color:'+tc.hex+'66;grid-column:1/-1"><div class="k">Seu trânsito de hoje (seu kin + kin do dia)</div><div class="v"><span style="color:'+tc.hex+'">Kin '+tk+' · '+esc(kinName(tk))+'</span><br><small>como o dia atravessa você · '+esc(toneQ(toneOf(tk)))+' · toque para abrir</small></div></div>';
+  if(annual) inner+='<div class="ibox" data-kin="'+annual+'" style="cursor:pointer"><div class="k">Seu ano pessoal ('+age+' anos)</div><div class="v">Kin '+annual+' · '+esc(kinName(annual))+'<br><small>onda de 13 anos nº '+(ci+1)+' · ano '+pos+' · tom '+esc(TONES[pos-1].name)+'</small></div></div>';
+  if(nextRet<=104) inner+='<div class="ibox"><div class="k">Renascimento galáctico</div><div class="v">'+nextRet+' anos · '+fmtDate(retDate)+'<br><small>faltam '+retDays+' dias · seu kin natal retorna</small></div></div>';
+  return '<div class="card" style="border-color:'+tc.hex+'44"><h3>Meu Dia <small>· '+esc(ow.name)+'</small></h3><div class="igrid">'+inner+'</div></div>';
+}
+function ownerSetupHTML(){
+  if(loadOwner())return "";
+  return '<div class="setupCard"><h4>✦ Defina o seu Kin</h4>'+
+    '<p>Diga seu nome e data de nascimento uma vez. O app passa a mostrar, todo dia, o seu <b>kin de trânsito</b> (o seu + o do dia) e o seu <b>caminho de vida</b> em ciclos de 13 anos, sem você procurar.</p>'+
+    '<div class="pform"><input id="ownName" placeholder="Seu nome" maxlength="30"><input id="ownDate" type="date"><button class="btn gold" id="ownSet">Este é o meu Kin</button></div></div>';
+}
+
 /* ================= VIEW: HOJE ================= */
 function render13MoonCard(o){
   const mi=moonInfo(o.y,o.m,o.d);
@@ -659,7 +720,7 @@ function renderCyclesCard(o,k){
 function renderHoje(){
   const o=shownDate, k=kinFor(o.y,o.m,o.d), isToday=sameYMD(o,todayYMD());
   const jumps=[-260,-52,-28,-13,-7,-1,0,1,7,13,28,52,260];
-  let h='<div class="datebar">'+
+  let h=ownerBannerHTML()+ownerSetupHTML()+'<div class="datebar">'+
     '<button class="btn" data-nav="-1" title="dia anterior">‹</button>'+
     '<input type="date" id="dateInput" value="'+toInput(o)+'">'+
     '<button class="btn" data-nav="1" title="próximo dia">›</button></div>'+
@@ -674,11 +735,21 @@ function renderHoje(){
        '<div class="kinSub">29 de fevereiro: dia fora da contagem de kins. Dia de vacuidade e presença pura.</div></div>';
     h+=render13MoonCard(o)+renderCyclesCard(o,0);
   }else{
-    h+=kinPanelHTML(k,fmtDate(o,true)+(isToday?" · hoje":""));
+    h+=kinHeroHTML(k,fmtDate(o,true)+(isToday?" · hoje":""));
+    if(isToday) h+=ownerDayHTML(k);
+    h+=oracleHTML(k)+affirmHTML(k)+waveStripHTML(k);
     h+=render13MoonCard(o)+renderCyclesCard(o,k);
   }
   $("view-hoje").innerHTML=h;
   $("dateInput").addEventListener("change",e=>{if(e.target.value){shownDate=fromInput(e.target.value);renderAll();}});
+  const os=$("ownSet");
+  if(os) os.addEventListener("click",()=>{
+    const nm=$("ownName").value.trim(), dt=$("ownDate").value;
+    if(!nm||!dt){alert("Preencha seu nome e data de nascimento.");return;}
+    saveOwner({name:nm,...fromInput(dt)}); renderAll();
+  });
+  const of=$("ownForget");
+  if(of) of.addEventListener("click",()=>{if(confirm("Esquecer seu kin definido?")){clearOwner();renderAll();}});
 }
 
 /* ================= VIEW: TZOLKIN ================= */
@@ -802,28 +873,37 @@ const loadProfiles=()=>{try{return JSON.parse(localStorage.getItem(PKEY))||[]}ca
 const saveProfiles=p=>localStorage.setItem(PKEY,JSON.stringify(p));
 function renderPerfis(){
   const ps=loadProfiles();
-  const tn=todayYMD(), todayK=kinFor(tn.y,tn.m,tn.d);
+  const ow=loadOwner(), owKin=ow?kinFor(ow.y,ow.m,ow.d):null;
+  const isOwner=p=>ow&&ow.name===p.name&&ow.y===p.y&&ow.m===p.m&&ow.d===p.d;
   let rows=ps.map(p=>{
     const k=kinFor(p.y,p.m,p.d);
     const c=COLORS[colorOf(k||1)].hex;
     const nx=k?nextDateOfKin(k,todayYMD()):null;
-    return '<div class="prow" style="--sealC:'+c+'">'+
+    const mine=isOwner(p);
+    let rel="";
+    if(owKin&&k&&!mine){const rk=transitKin(owKin,k);
+      rel='<span style="color:#c9b06a">Relação com você: Kin '+rk+' · '+esc(kinName(rk))+'</span>';}
+    return '<div class="prow'+(mine?" ownd":"")+'" style="--sealC:'+c+'">'+
       '<input type="checkbox" class="sel" data-id="'+p.id+'">'+
       '<span class="av" data-pid="'+p.id+'">'+(k?glyphSVG(k):"✳")+'</span>'+
-      '<span class="pi" data-pid="'+p.id+'"><b>'+esc(p.name)+'</b>'+
+      '<span class="pi" data-pid="'+p.id+'"><b>'+esc(p.name)+(mine?' <span style="color:var(--gold)">★ meu kin</span>':"")+'</b>'+
       '<span>'+pad(p.d)+"/"+pad(p.m)+"/"+p.y+(k?" · Kin "+k+" · "+esc(kinName(k)):" · 0.0 Hunab Ku")+'</span>'+
-      (k&&todayK?'<span style="color:#c9b06a">Trânsito hoje: Kin '+transitKin(k,todayK)+' · '+esc(kinName(transitKin(k,todayK)))+'</span>':"")+
+      rel+
       (nx?'<span>Aniversário galáctico: '+esc(fmtDate(nx))+'</span>':"")+
-      '</span><button class="del" data-del="'+p.id+'" title="remover">🗑</button></div>';
+      '</span>'+
+      (mine?"":'<button class="del" data-makeowner="'+p.id+'" title="tornar meu kin" style="color:#b79a52;font-size:1rem">☆</button>')+
+      '<button class="del" data-del="'+p.id+'" title="remover">🗑</button></div>';
   }).join("");
   $("view-perfis").innerHTML=
-   '<div class="card"><h3>Calcular Kin de Nascimento</h3>'+
+   (ow?"":'<div class="setupCard"><h4>✦ Defina o seu Kin</h4><p>Marque quem é você (☆ ao lado do nome) ou cadastre-se abaixo. Assim o app mostra seu trânsito diário na tela Hoje e a relação de cada pessoa com você.</p></div>')+
+   '<div class="card"><h3>'+(ow?"Calcular Kin de Outra Pessoa":"Calcular Kin de Nascimento")+'</h3>'+
    '<div class="pform"><input id="pName" placeholder="Nome" maxlength="30">'+
    '<input id="pDate" type="date"><button class="btn gold" id="pAdd">Calcular e salvar</button></div>'+
-   '<p class="hint">O kin fica salvo neste aparelho. Toque no nome para ver o painel completo.</p></div>'+
+   '<p class="hint">O kin fica salvo neste aparelho. Toque no nome para ver o painel completo (com trânsito e castelo de 13 anos).</p></div>'+
    (ps.length?'<div class="card"><h3>Meus Kins</h3><div class="plist">'+rows+'</div>'+
-     '<div class="relbar"><button class="btn gold" id="relBtn">♥ Kin da Relação (marque 2)</button></div>'+
-     '<p class="hint">Marque duas pessoas e toque no botão: o kin da relação é a soma dos dois kins no giro de 260.</p></div>':"");
+     '<div class="relbar"><button class="btn gold" id="relBtn">♥ Kin da Relação entre 2 pessoas (marque 2)</button></div>'+
+     '<p class="hint">☆ define quem é você · a relação com você já aparece em cada pessoa. O botão calcula a relação entre duas pessoas quaisquer.'+
+     (ow?' <button class="btn" id="ownForget" style="margin-top:8px">Trocar/esquecer meu kin</button>':"")+'</p></div>':"");
   $("pAdd").addEventListener("click",()=>{
     const nm=$("pName").value.trim(), dt=$("pDate").value;
     if(!nm||!dt){alert("Preencha nome e data de nascimento.");return;}
@@ -918,6 +998,13 @@ document.addEventListener("click",e=>{
   if(gt){shownDate=fromInput(gt.dataset.goto);closeModal();switchTab("hoje");return;}
   const dd=e.target.closest(".moonGrid .d[data-date]");
   if(dd){shownDate=fromInput(dd.dataset.date);switchTab("hoje");return;}
+  const ob=e.target.closest("[data-owner]");
+  if(ob){const ow=loadOwner();if(ow){const k=kinFor(ow.y,ow.m,ow.d);
+    if(k)openKinModal(k,ow.name+" · meu kin · "+fmtDate({y:ow.y,m:ow.m,d:ow.d}),{y:ow.y,m:ow.m,d:ow.d});}
+    return;}
+  const mk=e.target.closest("[data-makeowner]");
+  if(mk){const p=loadProfiles().find(x=>x.id===mk.dataset.makeowner);
+    if(p){saveOwner({name:p.name,y:p.y,m:p.m,d:p.d});renderPerfis();}return;}
   const del=e.target.closest("[data-del]");
   if(del){saveProfiles(loadProfiles().filter(p=>p.id!==del.dataset.del));renderPerfis();return;}
   const pp=e.target.closest("[data-pid]");
