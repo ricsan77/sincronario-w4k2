@@ -231,6 +231,44 @@ main{max-width:980px;margin:0 auto;padding:16px 14px 30px}
 .relbar{margin-top:12px;display:flex;justify-content:center}
 .hint{font-size:.78rem;color:var(--ink-dim);text-align:center;margin-top:10px;line-height:1.5}
 
+/* ---------- kins (diretório) ---------- */
+.searchInput{
+  width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+  color:var(--ink);font-family:var(--font-body);font-size:1rem;padding:11px 14px;margin-bottom:12px;
+}
+.searchInput::placeholder{color:#5f6a8f}
+.kinDir{display:flex;flex-direction:column;gap:4px;max-height:62vh;overflow-y:auto;padding-right:4px}
+.krow{
+  display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;
+  padding:6px 10px;background:#00000022;cursor:pointer;transition:border-color .15s;
+}
+.krow:hover{border-color:var(--gold-dim)}
+.krow svg{width:22px;height:22px;flex:0 0 auto}
+.krow b{font-size:.78rem;color:var(--ink-dim);width:58px;flex:0 0 auto;font-weight:600}
+.krow .nm{font-size:.86rem;flex:1}
+.krow .st{color:#7fe0a8;font-size:.8rem}
+/* ---------- castelos / estações ---------- */
+.castle{border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;background:#00000022}
+.castle.cur{border-color:var(--gold)}
+.castle h4{font-family:var(--font-display);font-size:.78rem;letter-spacing:.1em;margin-bottom:2px}
+.castle .sub{font-size:.7rem;color:var(--ink-dim);margin-bottom:8px}
+.castle .waveStrip{margin-bottom:5px}
+.castle .waveStrip .w{border-radius:5px;font-size:.58rem}
+.seasonRow{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:#00000022;margin-bottom:6px}
+.seasonRow.cur{border-color:var(--gold);background:#e8b84b12}
+.seasonRow i{width:14px;height:14px;border-radius:5px;flex:0 0 auto}
+.seasonRow .nm{flex:1;font-size:.86rem}.seasonRow .nm small{display:block;color:var(--ink-dim);font-size:.7rem}
+.seasonRow .rg{font-size:.7rem;color:var(--ink-dim)}
+/* ---------- caminho do destino ---------- */
+.pathGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:5px;max-height:46vh;overflow-y:auto;padding-right:4px}
+.age{
+  border:1px solid var(--line);border-radius:9px;padding:5px 4px;text-align:center;cursor:pointer;
+  background:#00000025;transition:border-color .15s;
+}
+.age:hover{border-color:var(--gold-dim)}
+.age.cur{border-color:var(--gold);background:#e8b84b14;box-shadow:0 0 10px #e8b84b33}
+.age .a{font-size:.6rem;color:var(--ink-dim);letter-spacing:.04em}
+.age .k{font-size:.72rem;font-weight:700;margin-top:1px}
 /* ---------- modal ---------- */
 .overlay{
   position:fixed;inset:0;z-index:60;background:#05070fd9;backdrop-filter:blur(6px);
@@ -256,8 +294,9 @@ nav.tabs button{
   font-size:.64rem;letter-spacing:.05em;cursor:pointer;display:flex;flex-direction:column;
   align-items:center;gap:3px;padding:4px 10px;border-radius:12px;transition:color .15s;
 }
-nav.tabs button svg{width:21px;height:21px}
+nav.tabs button svg{width:20px;height:20px}
 nav.tabs button.on{color:var(--gold)}
+@media(max-width:400px){nav.tabs button{padding:4px 6px;font-size:.6rem}}
 @media(min-width:760px){
   nav.tabs{position:sticky;top:58px;bottom:auto;justify-content:center;gap:14px;border-top:none;border-bottom:1px solid #232c4a}
   nav.tabs button{flex-direction:row;font-size:.8rem;gap:7px}
@@ -278,16 +317,18 @@ footer.app{max-width:980px;margin:10px auto 0;padding:0 16px 20px;font-size:.7re
 <nav class="tabs" id="tabs">
   <button data-tab="hoje" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/></svg>Hoje</button>
   <button data-tab="tzolkin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Tzolkin</button>
-  <button data-tab="onda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 15c3-6 5-6 8 0s5 6 8 0"/><path d="M2 8c3-6 5-6 8 0s5 6 8 0" opacity=".45"/></svg>Onda</button>
+  <button data-tab="ciclos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 15c3-6 5-6 8 0s5 6 8 0"/><path d="M2 8c3-6 5-6 8 0s5 6 8 0" opacity=".45"/></svg>Ciclos</button>
   <button data-tab="luas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 13.5A8.5 8.5 0 1 1 10.5 4 6.8 6.8 0 0 0 20 13.5z"/></svg>13 Luas</button>
+  <button data-tab="kins"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M8 10.5h5M10.5 8v5"/></svg>Kins</button>
   <button data-tab="perfis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.4"/><path d="M3 20c0-3.5 2.6-6 6-6s6 2.5 6 6"/><circle cx="17.5" cy="9.5" r="2.6"/><path d="M15.5 14.4c2.9.2 5 2.4 5 5.6" opacity=".6"/></svg>Perfis</button>
 </nav>
 
 <main>
   <section class="view active" id="view-hoje"></section>
   <section class="view" id="view-tzolkin"></section>
-  <section class="view" id="view-onda"></section>
+  <section class="view" id="view-ciclos"></section>
   <section class="view" id="view-luas"></section>
+  <section class="view" id="view-kins"></section>
   <section class="view" id="view-perfis"></section>
 </main>
 
@@ -379,6 +420,31 @@ const PLASMAS=[
 ];
 const HEPTADS=["Semana Vermelha: iniciar o conhecimento","Semana Branca: refinar o humilde","Semana Azul: transformar a paciência","Semana Amarela: amadurecer o fruto"];
 const GAP=new Set([1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,110,111,112,113,114,115,146,147,148,149,150,151,152,153,154,155,165,168,173,176,184,189,192,197,203,210,211,218,222,239,241,260]);
+/* Unidades Psi-Crono (banco psi): tabela fixa 13 luas x 28 dias.
+   Torres do Telektonon (dias 1-6 e 23-28) repetem kins de Portal por 3 dias;
+   cubo (dias 7-22) percorre os kins comuns em ordem. Fonte: placa do Banco Psi. */
+const PSI=[
+[1,1,1,20,20,20,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,241,241,241,260,260,260],
+[22,22,22,39,39,39,18,19,21,23,24,25,26,27,28,29,30,31,32,33,34,35,222,222,222,239,239,239],
+[43,43,43,58,58,58,36,37,38,40,41,42,44,45,46,47,48,49,52,53,54,55,203,203,203,218,218,218],
+[50,50,50,51,51,51,56,57,59,60,61,62,63,65,66,67,68,70,71,73,74,75,210,210,210,211,211,211],
+[64,64,64,77,77,77,76,78,79,80,81,82,83,84,86,87,89,90,91,92,94,95,184,184,184,197,197,197],
+[69,69,69,72,72,72,97,98,99,100,101,102,103,104,105,116,117,118,119,120,121,122,189,189,189,192,192,192],
+[85,85,85,96,96,96,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,165,165,165,176,176,176],
+[88,88,88,93,93,93,139,140,141,142,143,144,145,156,157,158,159,160,161,162,163,164,168,168,168,173,173,173],
+[106,106,106,115,115,115,166,167,169,170,171,172,174,175,177,178,179,180,181,182,183,185,146,146,146,155,155,155],
+[107,107,107,114,114,114,186,187,188,190,191,193,194,195,196,198,199,200,201,202,204,205,147,147,147,154,154,154],
+[108,108,108,113,113,113,206,207,208,209,212,213,214,215,216,217,219,220,221,223,224,225,148,148,148,153,153,153],
+[109,109,109,112,112,112,226,227,228,229,230,231,232,233,234,235,236,237,238,240,242,243,149,149,149,152,152,152],
+[110,110,110,111,111,111,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,150,150,150,151,151,151]
+];
+const SEASONS=[
+ {n:"Estação da Serpente Vermelha",sub:"fogo do leste: iniciar",hex:"#e05252"},
+ {n:"Estação do Cachorro Branco",sub:"verdade do norte: refinar",hex:"#efe9dc"},
+ {n:"Estação da Águia Azul",sub:"visão do oeste: transformar",hex:"#5b95e6"},
+ {n:"Estação do Sol Amarelo",sub:"fogo universal do sul: amadurecer",hex:"#eec84f"}
+];
+const CHROM_CLAN=["do Sangue","da Verdade","do Céu","do Fogo"]; /* pela cor do kin inicial: verm, branco, azul, amarelo */
 const WEEKDAYS=["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
 const MONTHS_PT=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 
@@ -453,10 +519,19 @@ function affirmationOf(k){
 function moonInfo(y,m,d){
   const sy=(m>7||(m===7&&d>=26))?y:y-1;
   const yearKin=kinFor(sy,7,26);
-  if(m===7&&d===25) return {special:"Dia Fora do Tempo",sy,yearKin};
-  if(m===2&&d===29) return {special:"0.0 Hunab Ku",sy,yearKin};
+  if(m===7&&d===25) return {special:"Dia Fora do Tempo",sy,yearKin,doy:364};
+  if(m===2&&d===29) return {special:"0.0 Hunab Ku",sy,yearKin,doy:null};
   const doy=Math.round((utc(y,m,d)-utc(sy,7,26))/MS)-(leapsUpTo(y,m,d)-leapsUpTo(sy,7,26));
-  return {moon:Math.floor(doy/28)+1, day:doy%28+1, sy, yearKin};
+  return {moon:Math.floor(doy/28)+1, day:doy%28+1, sy, yearKin, doy};
+}
+function psiOf(mi){return (mi.moon&&mi.day)?PSI[mi.moon-1][mi.day-1]:null;}
+function seasonOf(k){return SEASONS[Math.ceil(k/65)-1];}
+function harmonicOf(k){const h=Math.ceil(k/4);return {h,cell:CELLS[(h-1)%5],pos:colorOf(k)+1};}
+function chromaticOf(mi){
+  if(mi.doy==null) return null;
+  const start=((mi.yearKin-1+(mi.doy-mi.doy%5))%260)+1;
+  const c=colorOf(start);
+  return {i:Math.floor(mi.doy/5)+1, pos:mi.doy%5+1, name:"Cromática "+COLORS[c].fem+" "+CHROM_CLAN[c], hex:COLORS[c].hex};
 }
 function moonStartDate(sy,idx){ /* idx 0-12 */
   const [mm,dd]=MOON_STARTS[idx]; const yy=(mm>=7)?sy:sy+1; return {y:yy,m:mm,d:dd};
@@ -516,6 +591,8 @@ function kinHeroHTML(k,ctx){
       '<span class="badge">'+esc(familyOf(k))+'</span>'+
       '<span class="badge">'+esc(clanOf(k))+'</span>'+
       '<span class="badge" style="color:'+cast.hex+'aa">'+esc(cast.n)+'</span>'+
+      '<span class="badge">'+esc(seasonOf(k).n)+'</span>'+
+      '<span class="badge">Harmônica '+harmonicOf(k).h+' · célula: '+esc(harmonicOf(k).cell.replace(/^(a|o) /,""))+'</span>'+
     '</div></div>';
 }
 function oracleHTML(k){
@@ -562,6 +639,23 @@ function render13MoonCard(o){
   inner+='<div class="ibox"><div class="k">Ano (portador)</div><div class="v">'+esc(kinName(yk))+' <small>· Kin '+yk+' · NS desde 26/7/'+mi.sy+'</small></div></div>';
   return '<div class="card"><h3>Sincronário das 13 Luas</h3><div class="igrid">'+inner+'</div></div>';
 }
+function renderCyclesCard(o,k){
+  const mi=moonInfo(o.y,o.m,o.d);
+  const psi=psiOf(mi), ch=chromaticOf(mi);
+  let inner="";
+  if(psi){
+    inner+='<div class="ibox" data-kin="'+psi+'" style="cursor:pointer"><div class="k">Crono-Psi (banco psi)</div><div class="v">Kin '+psi+' · '+esc(kinName(psi))+'<br><small>'+(mi.day<=6||mi.day>=23?"torre do Telektonon (3 dias)":"cubo da inteligência (dia único)")+' · toque para abrir</small></div></div>';
+  }else{
+    inner+='<div class="ibox"><div class="k">Crono-Psi</div><div class="v">'+(mi.doy===364?"Dia Fora do Tempo: sem unidade psi":"Hunab Ku: fora do banco psi")+'</div></div>';
+  }
+  if(ch) inner+='<div class="ibox"><div class="k">Cromática entonada</div><div class="v"><span style="color:'+ch.hex+'">'+esc(ch.name)+'</span> <small>· '+ch.i+' de 73 · dia '+ch.pos+' de 5</small></div></div>';
+  if(k>0){
+    const se=seasonOf(k), ha=harmonicOf(k);
+    inner+='<div class="ibox"><div class="k">Estação galáctica</div><div class="v"><span style="color:'+se.hex+'">'+esc(se.n)+'</span> <small>· '+esc(se.sub)+'</small></div></div>';
+    inner+='<div class="ibox"><div class="k">Harmônica e célula do tempo</div><div class="v">Harmônica '+ha.h+' de 65 <small>· célula: '+esc(ha.cell)+' · '+esc(COLORS[colorOf(k)].n)+" "+esc(COLORS[colorOf(k)].faz)+'</small></div></div>';
+  }
+  return '<div class="card"><h3>Ciclos Sincrônicos do Dia</h3><div class="igrid">'+inner+'</div></div>';
+}
 function renderHoje(){
   const o=shownDate, k=kinFor(o.y,o.m,o.d), isToday=sameYMD(o,todayYMD());
   const jumps=[-260,-52,-28,-13,-7,-1,0,1,7,13,28,52,260];
@@ -578,10 +672,10 @@ function renderHoje(){
        '<div class="kinNum">'+esc(fmtDate(o,true))+'</div>'+
        '<div class="kinName">0.0 Hunab Ku</div>'+
        '<div class="kinSub">29 de fevereiro: dia fora da contagem de kins. Dia de vacuidade e presença pura.</div></div>';
-    h+=render13MoonCard(o);
+    h+=render13MoonCard(o)+renderCyclesCard(o,0);
   }else{
     h+=kinPanelHTML(k,fmtDate(o,true)+(isToday?" · hoje":""));
-    h+=render13MoonCard(o);
+    h+=render13MoonCard(o)+renderCyclesCard(o,k);
   }
   $("view-hoje").innerHTML=h;
   $("dateInput").addEventListener("change",e=>{if(e.target.value){shownDate=fromInput(e.target.value);renderAll();}});
@@ -609,22 +703,64 @@ function renderTzolkin(){
    '</div><p class="hint">Toque em qualquer kin para abrir o painel completo dele.</p></div>';
 }
 
-/* ================= VIEW: ONDA ================= */
-function renderOnda(){
+/* ================= VIEW: CICLOS ================= */
+function miniWave(startKin,curKin){
+  let s='<div class="waveStrip">';
+  for(let i=0;i<13;i++){const kk=startKin+i;
+    s+='<div class="w'+(kk===curKin?" cur":"")+'" data-kin="'+kk+'" style="background:'+COLORS[colorOf(kk)].hex+'" title="Kin '+kk+'">'+toneOf(kk)+'</div>';}
+  return s+'</div>';
+}
+function renderCiclos(){
   const k=kinFor(shownDate.y,shownDate.m,shownDate.d);
-  if(k===0){$("view-onda").innerHTML='<div class="card"><h3>Onda Encantada</h3><p class="hint">29/02 é o dia 0.0 Hunab Ku, fora da contagem. Navegue para outra data na aba Hoje.</p></div>';return;}
+  if(k===0){$("view-ciclos").innerHTML='<div class="card"><h3>Ciclos</h3><p class="hint">29/02 é o dia 0.0 Hunab Ku, fora da contagem. Navegue para outra data na aba Hoje.</p></div>';return;}
   const ws=waveOf(k), start=ws[0], cast=castleOf(start);
   const rows=ws.map((kk,i)=>{
-    const c=COLORS[colorOf(kk)].hex;
     return '<div class="wrow'+(kk===k?" cur":"")+'" data-kin="'+kk+'">'+
      '<span class="pos">'+(i+1)+'</span>'+glyphSVG(kk)+
      '<span class="nm">'+esc(kinName(kk))+'<small>'+esc(TONES[i].role)+'</small></span>'+
      '<span class="kn">Kin '+kk+(GAP.has(kk)?" ✦":"")+'</span></div>';
   }).join("");
-  $("view-onda").innerHTML=
+  /* castelos: 5 castelos de 52 kins, 4 ondas cada */
+  const curCastle=Math.floor((k-1)/52);
+  let castles="";
+  for(let c=0;c<5;c++){
+    const C=CASTLES[c];
+    let waves="";
+    for(let w=0;w<4;w++){
+      const st=c*52+w*13+1;
+      waves+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="font-size:.64rem;color:var(--ink-dim);width:86px;flex:0 0 auto">Onda '+(c*4+w+1)+' · '+esc(SEALS[sealOf(st)-1].name)+'</span>'+miniWave(st,k)+'</div>';
+    }
+    castles+='<div class="castle'+(c===curCastle?" cur":"")+'"><h4 style="color:'+C.hex+'">'+esc(C.n)+'</h4><div class="sub">'+esc(C.sub)+' · kins '+(c*52+1)+' a '+(c*52+52)+'</div>'+waves+'</div>';
+  }
+  /* estações galácticas de 65 kins */
+  const curSeason=Math.ceil(k/65)-1;
+  const seasons=SEASONS.map((s,i)=>'<div class="seasonRow'+(i===curSeason?" cur":"")+'"><i style="background:'+s.hex+'"></i><span class="nm">'+esc(s.n)+'<small>'+esc(s.sub)+'</small></span><span class="rg">kins '+(i*65+1)+' a '+(i*65+65)+'</span></div>').join("");
+  $("view-ciclos").innerHTML=
    '<div class="card"><h3>Onda Encantada '+esc(kinName(start).replace(/ (Magnétic[oa]|Magnética)/,""))+' <small>· kins '+ws[0]+' a '+ws[12]+'</small></h3>'+
    '<p class="hint" style="text-align:left;margin:0 0 12px">Ciclo de 13 dias do propósito (tom 1) à presença (tom 13). '+esc(cast.n)+", "+esc(cast.sub)+'. ✦ = portal de ativação galáctica.</p>'+
-   '<div class="waveList">'+rows+'</div></div>';
+   '<div class="waveList">'+rows+'</div></div>'+
+   '<div class="card"><h3>Os 5 Castelos do Tempo <small>· 20 ondas encantadas · giro de 260 kins</small></h3>'+castles+'</div>'+
+   '<div class="card"><h3>Estações Galácticas <small>· 4 espectros de 65 kins</small></h3>'+seasons+'</div>';
+}
+/* ================= VIEW: KINS ================= */
+const deacc=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+function kinRowsHTML(filter){
+  const f=deacc(filter||"").trim();
+  let out="",count=0;
+  for(let k=1;k<=260;k++){
+    const nm=kinName(k);
+    if(f && !(String(k)===f || deacc(nm).includes(f) || deacc("kin "+k).includes(f))) continue;
+    count++;
+    out+='<div class="krow" data-kin="'+k+'">'+glyphSVG(k)+'<b>Kin '+k+'</b><span class="nm">'+esc(nm)+'</span>'+(GAP.has(k)?'<span class="st">✦</span>':"")+'</div>';
+  }
+  return out||'<p class="hint">Nenhum kin encontrado. Tente um número (1 a 260) ou parte do nome (ex.: "mago", "tormenta cristal").</p>';
+}
+function renderKins(){
+  $("view-kins").innerHTML=
+   '<div class="card"><h3>Os 260 Kins <small>· toque para abrir o painel · ✦ portal</small></h3>'+
+   '<input class="searchInput" id="kinSearch" placeholder="Buscar: número ou nome (ex.: 149, lua ritmica...)" autocomplete="off">'+
+   '<div class="kinDir" id="kinDir">'+kinRowsHTML("")+'</div></div>';
+  $("kinSearch").addEventListener("input",e=>{$("kinDir").innerHTML=kinRowsHTML(e.target.value);});
 }
 
 /* ================= VIEW: 13 LUAS ================= */
@@ -672,8 +808,8 @@ function renderPerfis(){
     const nx=k?nextDateOfKin(k,todayYMD()):null;
     return '<div class="prow" style="--sealC:'+c+'">'+
       '<input type="checkbox" class="sel" data-id="'+p.id+'">'+
-      '<span class="av" data-pkin="'+(k||0)+'">'+(k?glyphSVG(k):"✳")+'</span>'+
-      '<span class="pi" data-pkin="'+(k||0)+'"><b>'+esc(p.name)+'</b>'+
+      '<span class="av" data-pid="'+p.id+'">'+(k?glyphSVG(k):"✳")+'</span>'+
+      '<span class="pi" data-pid="'+p.id+'"><b>'+esc(p.name)+'</b>'+
       '<span>'+pad(p.d)+"/"+pad(p.m)+"/"+p.y+(k?" · Kin "+k+" · "+esc(kinName(k)):" · 0.0 Hunab Ku")+'</span>'+
       (nx?'<span>Aniversário galáctico: '+esc(fmtDate(nx))+'</span>':"")+
       '</span><button class="del" data-del="'+p.id+'" title="remover">🗑</button></div>';
@@ -692,7 +828,7 @@ function renderPerfis(){
     const o=fromInput(dt), ps2=loadProfiles();
     ps2.push({id:Date.now()+""+Math.floor(Math.random()*999),name:nm,...o});
     saveProfiles(ps2); renderPerfis();
-    const k=kinFor(o.y,o.m,o.d); if(k)openKinModal(k,"Nascimento: "+fmtDate(o));
+    const k=kinFor(o.y,o.m,o.d); if(k)openKinModal(k,"Nascimento: "+fmtDate(o),o);
   });
   const rb=$("relBtn");
   if(rb) rb.addEventListener("click",()=>{
@@ -707,9 +843,28 @@ function renderPerfis(){
 }
 
 /* ================= MODAL ================= */
-function openKinModal(k,ctx){
+function destinyPathHTML(birth){
+  const today=todayYMD();
+  let curAge=today.y-birth.y-((today.m<birth.m||(today.m===birth.m&&today.d<birth.d))?1:0);
+  if(curAge<0)curAge=0;
+  let chips="";
+  for(let age=0;age<=104;age++){
+    const by=birth.y+age;
+    let bd={y:by,m:birth.m,d:birth.d};
+    if(birth.m===2&&birth.d===29){const leap=(by%4===0&&by%100!==0)||by%400===0; if(!leap)bd={y:by,m:2,d:28};}
+    const kk=kinFor(bd.y,bd.m,bd.d);
+    if(!kk)continue;
+    chips+='<div class="age'+(age===curAge?" cur":"")+'" data-kin="'+kk+'" style="border-color:'+COLORS[colorOf(kk)].hex+'44">'+
+      '<div class="a">'+age+' anos · '+by+'</div><div class="k" style="color:'+COLORS[colorOf(kk)].hex+'">Kin '+kk+'</div></div>';
+  }
+  return '<div class="card"><h3>Caminho do Destino <small>· o kin de cada aniversário · volta ao kin natal aos 52</small></h3>'+
+    '<div class="pathGrid">'+chips+'</div>'+
+    '<p class="hint">O ano atual está destacado em dourado. Toque num ano para abrir o kin dele.</p></div>';
+}
+function openKinModal(k,ctx,birth){
   const nx=nextDateOfKin(k,todayYMD());
   $("modalBody").innerHTML=kinPanelHTML(k,ctx||"")+
+    (birth?destinyPathHTML(birth):"")+
     (nx?'<div class="card"><h3>Próxima ocorrência</h3><p style="font-size:.92rem">'+esc(fmtDate(nx,true))+
     ' <button class="btn" style="margin-left:8px" data-goto="'+toInput(nx)+'">Abrir na aba Hoje</button></p></div>':"");
   $("overlay").classList.add("open");
@@ -720,7 +875,7 @@ function closeModal(){$("overlay").classList.remove("open");}
 /* ================= NAVEGAÇÃO ================= */
 function renderAll(){
   $("hdrDate").innerHTML=fmtDate(shownDate,true).replace(", ","<br>");
-  ({hoje:renderHoje,tzolkin:renderTzolkin,onda:renderOnda,luas:renderLuas,perfis:renderPerfis})[curTab]();
+  ({hoje:renderHoje,tzolkin:renderTzolkin,ciclos:renderCiclos,luas:renderLuas,kins:renderKins,perfis:renderPerfis})[curTab]();
 }
 function switchTab(tab){
   curTab=tab;
@@ -741,8 +896,11 @@ document.addEventListener("click",e=>{
   if(dd){shownDate=fromInput(dd.dataset.date);switchTab("hoje");return;}
   const del=e.target.closest("[data-del]");
   if(del){saveProfiles(loadProfiles().filter(p=>p.id!==del.dataset.del));renderPerfis();return;}
-  const pk=e.target.closest("[data-pkin]");
-  if(pk&&Number(pk.dataset.pkin)>0){openKinModal(Number(pk.dataset.pkin));return;}
+  const pp=e.target.closest("[data-pid]");
+  if(pp){const p=loadProfiles().find(x=>x.id===pp.dataset.pid);
+    if(p){const k=kinFor(p.y,p.m,p.d);
+      if(k)openKinModal(k,p.name+" · nascimento: "+fmtDate({y:p.y,m:p.m,d:p.d}),{y:p.y,m:p.m,d:p.d});}
+    return;}
   const kc=e.target.closest("[data-kin]");
   if(kc){openKinModal(Number(kc.dataset.kin));return;}
 });
