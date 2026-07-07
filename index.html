@@ -673,7 +673,7 @@ function ownerDayHTML(dayKin){
   let inner=
     '<div class="ibox" data-kin="'+tk+'" style="cursor:pointer;border-color:'+tc.hex+'66;grid-column:1/-1"><div class="k">Seu trânsito de hoje (seu kin + kin do dia)</div><div class="v"><span style="color:'+tc.hex+'">Kin '+tk+' · '+esc(kinName(tk))+'</span><br><small>como o dia atravessa você · '+esc(toneQ(toneOf(tk)))+' · toque para abrir</small></div></div>';
   if(annual) inner+='<div class="ibox" data-kin="'+annual+'" style="cursor:pointer"><div class="k">Seu ano pessoal ('+age+' anos)</div><div class="v">Kin '+annual+' · '+esc(kinName(annual))+'<br><small>onda de 13 anos nº '+(ci+1)+' · ano '+pos+' · tom '+esc(TONES[pos-1].name)+'</small></div></div>';
-  if(nextRet<=104) inner+='<div class="ibox"><div class="k">Renascimento galáctico</div><div class="v">'+nextRet+' anos · '+fmtDate(retDate)+'<br><small>faltam '+retDays+' dias · seu kin natal retorna</small></div></div>';
+  if(nextRet<=104) inner+='<div class="ibox"><div class="k">Renascimento galáctico (retorno de 52 anos)</div><div class="v">'+nextRet+' anos · '+fmtDate(retDate)+'<br><small>faltam '+retDays+' dias · seu kin natal volta pra sempre</small></div></div>';
   return '<div class="card" style="border-color:'+tc.hex+'44"><h3>Meu Dia <small>· '+esc(ow.name)+'</small></h3><div class="igrid">'+inner+'</div></div>';
 }
 function ownerSetupHTML(){
@@ -882,14 +882,14 @@ function renderPerfis(){
     const mine=isOwner(p);
     let rel="";
     if(owKin&&k&&!mine){const rk=transitKin(owKin,k);
-      rel='<span style="color:#c9b06a">Relação com você: Kin '+rk+' · '+esc(kinName(rk))+'</span>';}
+      rel='<span style="color:#c9b06a">Kin do relacionamento com você: Kin '+rk+' · '+esc(kinName(rk))+'</span>';}
     return '<div class="prow'+(mine?" ownd":"")+'" style="--sealC:'+c+'">'+
       '<input type="checkbox" class="sel" data-id="'+p.id+'">'+
       '<span class="av" data-pid="'+p.id+'">'+(k?glyphSVG(k):"✳")+'</span>'+
       '<span class="pi" data-pid="'+p.id+'"><b>'+esc(p.name)+(mine?' <span style="color:var(--gold)">★ meu kin</span>':"")+'</b>'+
       '<span>'+pad(p.d)+"/"+pad(p.m)+"/"+p.y+(k?" · Kin "+k+" · "+esc(kinName(k)):" · 0.0 Hunab Ku")+'</span>'+
       rel+
-      (nx?'<span>Aniversário galáctico: '+esc(fmtDate(nx))+'</span>':"")+
+      (nx?'<span>Próximo aniversário galáctico (o kin volta a cada 260 dias): '+esc(fmtDate(nx))+'</span>':"")+
       '</span>'+
       (mine?"":'<button class="del" data-makeowner="'+p.id+'" title="tornar meu kin" style="color:#b79a52;font-size:1rem">☆</button>')+
       '<button class="del" data-del="'+p.id+'" title="remover">🗑</button></div>';
